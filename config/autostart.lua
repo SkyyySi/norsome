@@ -11,10 +11,6 @@ local run_on_start_up = {
     'blueman-applet 2>/dev/null',
     'lxsession --session=awesome --de=awesome',
     'ulauncher',
---  'bash /home/simon/.screenlayout/90_tripplescreen.sh',
---  'bash /home/simon/.config/start_jack.sh',
---  'gnome-flashback 2>/dev/null',
---  'glava -d >/dev/null'
 }
 
 local function run_once(cmd)

@@ -24,12 +24,13 @@ theme.fg_focus      = "#d8dee9"
 theme.fg_urgent     = "#2e3440"
 theme.fg_minimize   = "#d8dee9"
 
-theme.useless_gap   = dpi(0)
+theme.useless_gap   = dpi(4)
 theme.border_width  = dpi(2)
 theme.border_normal = "#4c566a"
 theme.border_focus  = "#d8dee9"
 theme.border_marked = "#d8dee9"
 
+theme.bg_systray           = '#4C566A'
 theme.systray_icon_spacing = dpi(10)
 theme.systray_icon_size    = dpi(15)
 

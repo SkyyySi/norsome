@@ -24,22 +24,26 @@ require("awful.hotkeys_popup.keys")
 -- a modified version of the code that takes care of the bar order.
 awfulwibar = require("awfulwibar")
 
--- Set the screen layout
-awful.spawn.with_shell('/home/simon/.screenlayout/90_tripplescreen.sh')
+-- Autostart applications
+awful.spawn(awful.util.getdir("config") .. '/autostart.sh')
+
 
 -- Error handling
 dofile(awful.util.getdir("config") .. "config/error-handler.lua")
 
 -- {{{ Variable definitions
-theme       = "nord"
-terminal    = "alacritty"
-webbrowser  = "firefox"
-filemanager = "pcmanfm"
-editor      = "code"
+theme       = 'nord'
+terminal    = 'alacritty'
+webbrowser  = 'firefox'
+filemanager = 'pcmanfm'
+editor      = 'code'
 editor_cmd  = editor
+config_dir  = awful.util.getdir('config')
+themes_dir  = config_dir .. 'themes/'
+theme_dir   = themes_dir .. theme
 
 -- Themes define colours, icons, font and wallpapers.
-beautiful.init(awful.util.getdir("config") .. "themes/" .. theme .. "/theme.lua")
+beautiful.init(theme_dir .. "/theme.lua")
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -76,13 +80,14 @@ awful.layout.layouts = {
 
 -- {{{ Menu
 -- Generate an xdg app menu
-awful.spawn.with_shell("xdg_menu --format awesome --root-menu /etc/xdg/menus/arch-applications.menu > ~/.config/awesome/archmenu.lua")
+--awful.spawn.with_shell("xdg_menu --format awesome --root-menu /etc/xdg/menus/arch-applications.menu > ~/.config/awesome/archmenu.lua")
 
 -- Create a launcher widget and a main menu
 local menu_awesome = {
     { "Show hotkeys", function() hotkeys_popup.show_help(nil, awful.screen.focused()) end },
     { "Show manual", terminal .. " -e man awesome" },
-    { "Edit config", editor_cmd .. " " .. awesome.conffile },
+--    { "Edit config", editor_cmd .. " " .. awesome.conffile },
+    { "Edit config", editor_cmd .. " " .. config_dir },
     { "Restart awesome", awesome.restart },
     { "Quit awesome", function() awesome.quit() end },
 }
@@ -107,7 +112,180 @@ local awesome_menu = awful.menu({ items = { { "Awesome", menu_awesome, beautiful
 local rounded_rectangle = require("rounded_rectangle")
 local rounded_wibox     = require("rounded_wibox")
 
+----------------------------------------------------------------------------------------------------------------------------------
+-- Closable wibox
+----------------------------------------------------------------------------------------------------------------------------------
+--[[
+local animWibox = wibox {
+    bg      = '#347653',
+    width   = 100,
+    height  = 100,
+    visible = true,
+    ontop   = true,
+}
+awful.placement.bottom_right(animWibox, { margins = {bottom = 50, right = 50}, parent = awful.screen.focused()})
 
+local animWiboxButton = wibox.widget {
+    {
+        {
+            text = "Button",
+            widget = wibox.widget.textbox,
+        },
+        margins = 4,
+        widget  = wibox.container.margin,
+    },
+    bg                 = '#00000080',
+    shape              = rounded_rectangle(10),
+    shape_border_width = 1,
+    shape_border_color = '#AAEEFF',
+    widget             = wibox.container.background,
+}
+
+animWiboxButton:connect_signal("mouse::enter",    function(c) c:set_bg('#40404080') end)
+animWiboxButton:connect_signal("mouse::leave",    function(c) c:set_bg('#00000080') end)
+animWiboxButton:connect_signal("button::press",   function(c) c:set_bg('#80808080') end)
+animWiboxButton:connect_signal("button::release", function(c) c:set_bg('#40404080') end)
+
+local opacity = 0.1
+local animWiboxCircle = wibox.widget {
+    {
+        widget = wibox.widget.textbox(' ')
+    },
+    bg                 = '#0000',
+    shape              = gears.shape.circle,
+    shape_border_width = 2,
+    shape_border_color = '#FFFFFF',
+    widget             = wibox.container.background,
+    opacity            = opacity
+}
+
+animWibox:setup {
+    {
+        animWiboxButton,
+        animWiboxCircle,
+        layout = wibox.layout.align.vertical,
+    },
+    widget = wibox.container.background,
+    valigh = 'center',
+    layout = wibox.container.place
+}
+
+animWiboxButton:connect_signal("button::press", function(c, _, _, button)
+    if button == 1 then
+        gears.timer {
+            timeout   = 4,
+            call_now  = true,
+            autostart = true,
+            callback  = function()
+                local range
+                for range=0,10 do
+                    local i = range / 10
+                    animWiboxCircle.opacity = i
+                    animWiboxCircle:emit_signal("widget::redraw_needed")
+                end
+            end
+        }
+    end
+end) --]]
+
+--[[
+local makeCloseButton
+function makeCloseButton(args)
+    local bg_normal = args.bg_normal or '#00000080'
+    local bg_select = args.bg_select or '#80808080'
+    local s         = args.scale     or 100
+    local scale     = s / 5
+
+    local close_button = wibox.widget {
+        {
+            {
+                image  = '/home/simon/Dokumente/svg/close.svg',
+                resize = true,
+                widget = wibox.widget.imagebox,
+            },
+            margins = scale,
+            widget  = wibox.container.margin,
+        },
+        bg     = bg_normal,
+        shape  = gears.shape.circle,
+        widget = wibox.container.background,
+    }
+
+    close_button:connect_signal("mouse::enter", function(c)
+        c:set_bg(bg_select)
+    end)
+    close_button:connect_signal("mouse::leave", function(c)
+        c:set_bg(bg_normal)
+    end)
+
+    close_button:connect_signal("button::release", function(c, _, _, button)
+        if button == 1 then
+            naughty.notify{text = 'Left click'}
+
+        elseif button == 2 then
+            naughty.notify{text = 'Wheel click'}
+
+        elseif button == 3 then
+            naughty.notify{text = 'Right click'}
+        end
+    end)
+
+    return close_button
+end
+
+local testbox = wibox {
+    width   = 30,
+    height  = 30,
+    visible = true,
+    ontop   = true,
+    shape   = rounded_rectangle(17),
+}
+
+testbox:setup {
+    {
+        {
+            makeCloseButton({scale = 30}),
+            layout = wibox.layout.stack,
+        },
+        width         = 50,
+        height        = 50,
+        forced_width  = 50,
+        forced_height = 50,
+        strategy      = 'min',
+        widget        = wibox.container.constraint,
+        layout        = wibox.layout.stack,
+    },
+    layout = wibox.layout.stack,
+    shape  = rounded_rectangle(18),
+    bg     = '#0000',
+    widget = wibox.container.background,
+}
+
+local fullbox = wibox {
+    bg      = '#202020',
+    width   = 400,
+    height  = 300,
+    visible = true,
+--    ontop   = true,
+    shape   = rounded_rectangle(17),
+}
+
+fullbox:setup {
+    {
+        widget = testbox,
+        layout = wibox.layout.align.horizontal,
+    },
+    shape  = rounded_rectangle(18),
+    bg     = '#202020',
+    widget = wibox.container.background,
+}
+
+awful.placement.bottom_right(fullbox, { margins = {bottom = 50, right = 50}, parent = awful.screen.focused()})
+awful.placement.bottom_right(testbox, { margins = {bottom = 310, right = 60}, parent = awful.screen.focused()}) --]]
+
+----------------------------------------------------------------------------------------------------------------------------------
+-- Closable wibox end
+----------------------------------------------------------------------------------------------------------------------------------
 
 local menubutton = require("menubutton")
 
@@ -116,7 +294,169 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 -- }}}
 
 -- Keyboard map indicator and switcher
-mykeyboardlayout = awful.widget.keyboardlayout()
+local mykeyboardlayout = awful.widget.keyboardlayout()
+local kbdlayout = wibox.widget {
+    {
+        {
+            mykeyboardlayout,
+            layout = wibox.layout.align.horizontal,
+        },
+        bg     = '#3b4252',
+        widget = wibox.container.background,
+        layout = wibox.layout.align.horizontal,
+        shape  = rounded_rectangle(20),
+    },
+    margins            = 4,
+    shape_border_width = 1,
+    shape_border_color = '#d8dee9',
+    widget             = wibox.container.margin,
+    layout             = wibox.layout.align.horizontal,
+}
+
+-- {{{ Dock
+local awedock
+function awedock(arg)
+    local position = arg.position or 'bottom'
+    local height   = arg.size or 64
+    local width    = height
+    local widgets  = arg.widgets
+    for i, v in pairs(widgets) do width = width + height end
+    width = width - height
+    widgets['layout'] = wibox.layout.fixed.horizontal
+
+    local awedock_aa_box = awfulwibar {
+        bg       = '#0000',
+        type     = 'desktop',
+        width    = width,
+        height   = height,
+        ontop    = true,
+        visible  = true,
+        stretch  = false,
+        position = 'bottom',
+        --layout   = wibox.layout.flex.horizontal,
+    }
+
+    local cly = client.focus
+    local icon_widget = wibox.widget {
+        {
+            {
+                {
+                    --image  = awful.widget.clienticon(cly),
+                    image  = beautiful.awesome_icon,
+                    resize = true,
+                    widget = wibox.widget.imagebox,
+                },
+                margins = 2,
+                widget  = wibox.container.margin,
+            },
+            bg     = '#FFFFFF40',
+            shape  = rounded_rectangle(5),
+            widget = wibox.container.background,
+        },
+        margins = 4,
+        widget  = wibox.container.margin,
+    }
+
+    local dockwidget = {}
+    dockwidget.menu = wibox.widget {
+        {
+            icon_widget,
+            layout = wibox.layout.align.horizontal,
+        },
+        margins = 2,
+        widget  = wibox.container.margin,
+    }
+
+    local awedock
+    awedock = wibox.widget {
+        {
+            color        = '#00000080',
+            orientation  = 'horizontal',
+            thickness    = 50,
+            forced_width = 40,
+            widget       = wibox.widget.separator,
+            shape        = rounded_rectangle(10),
+        },
+        width    = width,
+        height   = height,
+        strategy = 'exact',
+        widget   = wibox.container.constraint,
+    }
+
+    awedock_aa_box:setup {
+        layout = wibox.layout.align.horizontal,
+        {
+            {
+                layout = wibox.layout.fixed.horizontal,
+                awedock
+            },
+            {
+                {
+                    layout = wibox.layout.fixed.horizontal,
+                    widgets,
+                },
+                margins = 4,
+                widget  = wibox.container.margin,
+            },
+            layout = wibox.layout.stack,
+        },
+    }
+
+    return(awedock_aa_box)
+end
+
+local icon_widget = wibox.widget {
+    {
+        {
+            {
+                --image  = awful.widget.clienticon(cly),
+                image  = beautiful.awesome_icon,
+                resize = true,
+                widget = wibox.widget.imagebox,
+            },
+            margins = 2,
+            widget  = wibox.container.margin,
+        },
+        bg     = '#FFFFFF40',
+        shape  = rounded_rectangle(5),
+        widget = wibox.container.background,
+    },
+    margins = 4,
+    widget  = wibox.container.margin,
+}
+
+local dockwidget
+function dockwidget(c)
+    local widget = wibox.widget {
+        {
+            {
+                icon_widget,
+                layout = wibox.layout.align.horizontal,
+            },
+            margins = 2,
+            widget  = wibox.container.margin,
+        },
+        bg     = c or 'red',
+        widget = wibox.container.background,
+    }
+
+    return(widget)
+end
+
+--dock = awedock({
+--    size     = 80,
+--    position = 'bottom',
+--    widgets  = {
+--        dockwidget('red'),
+--        dockwidget('green'),
+--        dockwidget('blue'),
+--        --layout = wibox.layout.fixed.horizontal,
+--    }
+--})
+
+--awful.placement.bottom(dock, { margins = { bottom = 5 }, parent = awful.screen.focused()})
+-- }}}
+
 
 -- {{{ Wibar
 -- Create a textclock widget
@@ -124,43 +464,47 @@ mytextclock = wibox.widget.textclock()
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
-                    awful.button({ }, 1, function(t) t:view_only() end),
-                    awful.button({ modkey }, 1, function(t)
-                                              if client.focus then
-                                                  client.focus:move_to_tag(t)
-                                              end
-                                          end),
-                    awful.button({ }, 3, awful.tag.viewtoggle),
-                    awful.button({ modkey }, 3, function(t)
-                                              if client.focus then
-                                                  client.focus:toggle_tag(t)
-                                              end
-                                          end),
-                    awful.button({ }, 4, function(t) awful.tag.viewprev(t.screen) end),
-                    awful.button({ }, 5, function(t) awful.tag.viewnext(t.screen) end)
-                )
+    awful.button({ }, 1, function(t) t:view_only() end),
+    awful.button({ modkey }, 1, function(t)
+        if client.focus then
+            client.focus:move_to_tag(t)
+        end
+    end),
+    awful.button({ }, 3, awful.tag.viewtoggle),
+    awful.button({ modkey }, 3, function(t)
+        if client.focus then
+            client.focus:toggle_tag(t)
+        end
+    end),
+    awful.button({ }, 4, function(t) awful.tag.viewprev(t.screen) end),
+    awful.button({ }, 5, function(t) awful.tag.viewnext(t.screen) end)
+)
 
 local tasklist_buttons = gears.table.join(
-                     awful.button({ }, 1, function (c)
-                                              if c == client.focus then
-                                                  c.minimized = true
-                                              else
-                                                  c:emit_signal(
-                                                      "request::activate",
-                                                      "tasklist",
-                                                      {raise = true}
-                                                  )
-                                              end
-                                          end),
-                     awful.button({ }, 3, function()
-                                              awful.menu.client_list({ theme = { width = 250 } })
-                                          end),
-                     awful.button({ }, 4, function ()
-                                              awful.client.focus.byidx(1)
-                                          end),
-                     awful.button({ }, 5, function ()
-                                              awful.client.focus.byidx(-1)
-                                          end))
+    awful.button({ }, 1, function (c)
+        if c == client.focus then
+            c.minimized = true
+        else
+            c:emit_signal(
+                "request::activate",
+                "tasklist",
+                {raise = true}
+            )
+        end
+    end),
+
+    awful.button({ }, 3, function()
+        awful.menu.client_list({ theme = { width = 250 } })
+    end),
+
+    awful.button({ }, 4, function ()
+        awful.client.focus.byidx(1)
+    end),
+
+    awful.button({ }, 5, function ()
+        awful.client.focus.byidx(-1)
+    end)
+)
 
 local function set_wallpaper(s)
     -- Wallpaper
@@ -168,330 +512,273 @@ local function set_wallpaper(s)
     awful.spawn("hsetroot -add '#2e3440' -add '#eceff4' -gradient 180")
 end
 
-local volume = 50
-function get_volume(f)
-    awful.spawn.easy_async_with_shell('pamixer --get-volume', function(vol)
-        f(tonumber(vol))
-    end)
-end
+local volume_button = require('modules.widgets.volume')
 
-local volume_button_text = wibox.widget {
-    font   = 'MesloLFS Bold 12',
-    text   = '🔊 ',
-    widget = wibox.widget.textbox,
-}
+--- CALENDAR ---
+local calendar_widget = require('modules.widgets.calendar')
 
-local volume_button = wibox.widget {
-    {
+--- CONTROL PANEL ---
+local control_panel_widget
+function control_panel_widget(s)
+    --local xresources = require("beautiful.xresources")
+    --local dpi        = xresources.apply_dpi
+
+    s.widget_volume_icon   = wibox.widget {
         {
-            {
-                volume_button_text,
-                layout  = wibox.layout.align.horizontal,
-            },
-            top = 4, bottom = 4, left = 8, right = 8,
-            widget = wibox.container.margin
+            font   = 'Source Code Pro 16',
+            text   = ' 🔊 ',
+            widget = wibox.widget.textbox,
         },
-        bg = '#4C566A',
-        shape_border_width = 1,
-        shape_border_color = '#d8dee9',
-        shape = function(cr, width, height)
-            gears.shape.rounded_rect(cr, width, height, 20)
-        end,
+        bg     = '#444444',
+        shape  = rounded_rectangle(20),
         widget = wibox.container.background,
-    },
-    margins = 4,
-    widget = wibox.container.margin
-}
-
-function volume_button_update(v)
-    if v == 0 then
-        volume_button_text.text = '🔇 '
-    elseif v < 24 then
-        volume_button_text.text = '🔈 '
-    elseif v < 74 then
-        volume_button_text.text = '🔉 '
-    else
-        volume_button_text.text = '🔊 '
-    end
-end
-
-local volume_box_aa
-
-get_volume(function(volume)
-    volume_button_update(volume)
-
-    local volslider = wibox.widget {
-        bar_color           = '#CCCCCC',
-        bar_shape           = gears.shape.rounded_rect,
-        bar_height          = 2,
-        --bar_margins         = 0,
-        handle_color        = '#999999',
-        handle_border_color = '#FFFFFF',
-        handle_border_width = 2,
-        handle_shape        = gears.shape.circle,
-        handle_width        = 25,
-        
-        value               = volume,
-        minimum             = 0,
-        maximum             = 100,
-        
-        forced_width        = 200,
-        forced_height       = 50,
-        
-        widget              = wibox.widget.slider,
-    }
-
-    local voltext = wibox.widget {
-        --[[iamge  = '/home/simon/Bilder/vol.svg',
-        resize = true,
-        forced_height = 32,
-        widget = wibox.widget.imagebox]]--
-        font   = 'Source Sans Pro 16',
-        text   = volume,
-        widget = wibox.widget.textbox,
     }
 
     local volume_slider = wibox.widget {
+        bar_shape           = gears.shape.rounded_rect,
+        bar_height          = 4,
+        bar_color           = '#88c0d0',
+        handle_color        = '#81a1c1',
+        handle_shape        = gears.shape.circle,
+        handle_border_color = '#eceff4',
+        handle_border_width = 2,
+        value               = 50,
+        minimum             = 0,
+        maximum             = 100,
+        widget              = wibox.widget.slider,
+    }
+
+    s.widget_volume_slider = wibox.widget {
         {
             {
                 {
-                    voltext,
+                    volume_slider,
                     layout = wibox.layout.align.horizontal,
                 },
-                margins = 4,
-                widget = wibox.container.margin
+                left   = 15,
+                right  = 15,
+                widget = wibox.container.margin,
             },
-            {
-                {
-                    volslider,
-                    layout = wibox.layout.align.horizontal,
-                },
-                top = 4, bottom = 4, right = 8,
-                widget = wibox.container.margin
-            },
-            layout  = wibox.layout.align.horizontal,
+            bg     = '#555555',
+            shape  = rounded_rectangle(999),
+            widget = wibox.container.background,
         },
-        visible = true,
-        widget  = wibox.container.background,
+        strategy = 'exact',
+        width    = 300,
+        height   = 60,
+        widget = wibox.container.constraint
     }
-
-    function update_volume(v)
-        if v then
-            local vol
-            if v < 0 then
-                vol = 0
-            elseif v > 100 then
-                vol = 100
-            else
-                vol = v
-            end
-            awful.spawn('pamixer --set-volume '..vol)
-            volume = vol
-            volslider.value = vol
-        end
-        voltext.text = volume
-        volume_button_update(volume)
-    end
-    
-    volslider:connect_signal('property::value', function ()
-        update_volume(volslider.value)
-    end)
-
-    --[[ popup:setup {
-        volume_slider,
-        valigh = 'center',
-        layout = wibox.container.place
-    }
-
-    awful.placement.top_right(popup, { margins = {top = 48, right = 16}, parent = awful.screen.focused()}) ]]--
 
     local old_cursor, old_wibox
     volume_slider:connect_signal("mouse::enter", function(c)
-        volume_slider.widget.handle_color = '#FFFFFF'
+        c:set_handle_color('#88c0d0') -- hovered / nord 3
         local wb = mouse.current_wibox
         old_cursor, old_wibox = wb.cursor, wb
         wb.cursor = "hand1"
     end)
     volume_slider:connect_signal("mouse::leave", function(c)
-        volume_slider.widget.handle_color = '#999999'
+        c:set_handle_color('#81a1c1') -- default / nord 2
         if old_wibox then
             old_wibox.cursor = old_cursor
             old_wibox = nil
         end
     end)
 
-    volslider:connect_signal("mouse::enter", function(c)
-        c.handle_color = '#DDDDDD'
-    end)
-    volslider:connect_signal("mouse::leave", function(c)
-        c.handle_color = '#999999'
-    end)
-
-    --[[
-    volume_button:setup {
-        volume_slider,
-        valigh = 'center',
-        layout = wibox.container.place
-    }
-
-    awful.placement.top(volume_button, { margins = {top = 40}, parent = awful.screen.focused()})
-    ]]--
-
-    --- ANTI-ALIASING ---
-
-    -- Create the box
-    volume_box_aa = wibox({
-        ontop   = true,
-        type    = "dialog",
-    --    x       = 690,
-    --    y       = 1060,
-        shape = function(cr,w,h)
-            gears.shape.rounded_rect(cr,w,h,20)
-        end;
-        placement = awful.placement.centered,
-        height    = 50,
-        width     = 300,
-        visible   = false,
-    })
-
-    -- Place it at the center of the screen
-    awful.placement.centered(volume_box_aa)
-
-    -- Set bg and fg
-    volume_box_aa.bg = "#2e344080"
-    volume_box_aa.fg = "#d8dee9"
-
-    local volume_box_content = {
-            {
-                font   = 'Source Sans Pro Bold 16',
-                text   = '    VOL: ',
-                widget = wibox.widget.textbox,
-            },
-            {
-                volume_slider,
-                layout = wibox.layout.align.horizontal,
-            },
-            margins   = 32,
-            layout    = wibox.layout.align.horizontal,
-            widget    = wibox.container.margin,
-    }
-
-    -- Put its items in a shaped container
-    volume_box_aa:setup {
-        {
-            {
-                volume_box_content,
-                layout = wibox.layout.align.horizontal
-            },
-            halign    = 'center',
-            valign    = 'center',
-            layout    = wibox.layout.align.horizontal,
-            placement = awful.placement.centered,
-            widget    = wibox.container.place,
-        },
-        shape_border_width = 2,
-        shape_border_color = '#FFFFFF',
-        shape  = rounded_rectangle(20),
-        widget = wibox.widget.background,
-    }
-
-    volume_button:connect_signal("button::release", function(c, _, _, button)
+    volume_slider:connect_signal("button::press",   function(c)
         if button == 1 then
-            update_volume()
-            volume_box_aa.visible = not volume_box_aa.visible
-        elseif button == 2 then
-            awful.spawn('pavucontrol')
+            c:set_handle_color('#5e81ac') -- pressed  / nord 4
         end
     end)
+    volume_slider:connect_signal("button::release", function(c) c:set_handle_color('#81a1c1') end) -- released / nord 3
 
-    volume_button:connect_signal("button::press", function(c, _, _, button)
-        local vol
-        if button     == 4 then
-            vol = volume + 5 -- increase volume by 5 percent
-        elseif button == 5 then
-            vol = volume - 5 -- decrease volume by 5 percent
-        end
-        update_volume(vol)
-    end)
+    s.control_panel = awfulwibar {
+        bg       = '#222',
+        position = 'right',
+        stretch  = true,
+        visible  = false,
+        ontop    = true,
+        screen   = s,
+        width    = 400,
+        layout = wibox.layout.flex.vertical,
+    }
 
-    awful.placement.top_right(volume_box_aa, { margins = {top = 48, right = 16}, parent = awful.screen.focused()})
-
-end)
-
---- CALENDAR ---
-
-local calendar = wibox({
-    ontop     = true,
-    type      = "dialog",
-    shape     = rounded_rectangle(20),
-    placement = awful.placement.centered,
-    height    = 300,
-    width     = 190,
-    visible   = false,
-})
-
--- Place it at the center of the screen
-awful.placement.centered(calendar)
-
--- Set bg and fg
-calendar.bg = "#2e344080"
-calendar.fg = "#d8dee9"
-
-local cal = wibox.widget.calendar.month(os.date('*t'), 'Source Code Pro 12')
-local volume_box_content = {
-    cal,
-    layout = wibox.layout.align.horizontal
-}
-
--- Put its items in a shaped container
-calendar:setup {
-    {
+    s.control_panel:setup {
+        direction = "east",
+        layout    = wibox.layout.align.vertical,
+        --[[{
+            s.widget_volume_icon,
+            layout = wibox.layout.fixed.vertical,
+        },
+        {
+            s.widget_volume_icon,
+            layout = wibox.layout.flex.vertical,
+        },--]]
         {
             {
-                volume_box_content,
-                layout = wibox.layout.align.horizontal
-            },
-            left = 10,
-            widget = wibox.container.margin
-        },
-        halign    = 'center',
-        valign    = 'center',
-        layout    = wibox.layout.align.horizontal,
-        placement = awful.placement.centered,
-        widget    = wibox.container.place,
-    },
-    shape_border_width = 2,
-    shape_border_color = '#FFFFFF',
-    shape  = rounded_rectangle(20),
-    widget = wibox.widget.background,
-}
-
-local calendar_button = wibox.widget{
-    {{{{
-                    widget = wibox.widget.textclock('%a %b %d, %H:%M'),
+                {
+                    --[[{
+                        s.widget_volume_icon,
+                        layout = wibox.layout.fixed.horizontal,
+                    },--]]
+                    {
+                        nil,
+                        layout = wibox.layout.fixed.horizontal,
+                    },
+                    {
+                        s.widget_volume_slider,
+                        layout = wibox.layout.fixed.horizontal,
+                    },
+                    {
+                        nil,
+                        layout = wibox.layout.fixed.horizontal,
+                    },
+                    bg     = '#606060',
+                    widget = wibox.container.background,
+                    layout = wibox.layout.align.horizontal,
                 },
-                left = 10, right = 10,
-                widget = wibox.container.margin
+                layout = wibox.layout.fixed.horizontal,
             },
-            layout = wibox.layout.align.horizontal
+        margins = 10,
+        widget  = wibox.container.margin,
         },
-        bg = '#4C566A',
-        shape_border_width = 1,
-        shape_border_color = '#d8dee9',
-        shape = rounded_rectangle(20),
-        widget = wibox.container.background
-    },
-    margins = 4,
-    widget = wibox.container.margin
-}
+    }
 
-calendar_button:connect_signal("button::release", function(c, _, _, button) 
-    if button == 1 then
-        calendar.visible = not calendar.visible
+    s.control_panel_button = wibox.widget{
+        {{{
+                    font = 'Source Code Pro Black 22',
+                    text = '◀',
+                    widget = wibox.widget.textbox,
+                },
+                top = 4, bottom = 4, left = 8, right = 8,
+                widget = wibox.container.margin,
+            },
+            bg = '#3b4252',
+            shape_border_width = 1,
+            shape_border_color = '#d8dee9',
+            shape = rounded_rectangle(20),
+            widget = wibox.container.background,
+        },
+        margins = 4,
+        widget = wibox.container.margin,
+    }
+
+    if s.control_panel.visible == true then
+        s.control_panel_button.widget.widget.widget.text = '▶'
+    else
+        s.control_panel_button.widget.widget.widget.text = '◀'
     end
-end)
 
-awful.placement.top_right(calendar, { margins = {top = 48, right = 16}, parent = awful.screen.focused()})
+    local old_cursor, old_wibox
+    s.control_panel_button.widget:connect_signal("mouse::enter", function(c)
+        c:set_bg('#434c5e') -- hovered  / nord 2
+        local wb = mouse.current_wibox
+        old_cursor, old_wibox = wb.cursor, wb
+        wb.cursor = "hand1"
+    end)
+    s.control_panel_button.widget:connect_signal("mouse::leave", function(c)
+        c:set_bg('#3b4252') -- default  / nord 1
+        if old_wibox then
+            old_wibox.cursor = old_cursor
+            old_wibox = nil
+        end
+    end)
+
+    s.control_panel_button.widget:connect_signal("button::press",   function(c) c:set_bg('#4c566a') end) -- pressed  / nord 3
+    s.control_panel_button.widget:connect_signal("button::release", function(c)
+        c:set_bg('#434c5e') -- released / nord 2
+        if s.control_panel.visible == false then
+            s.control_panel.visible = true
+            s.control_panel_button.widget.widget.widget.text = '▶'
+        else
+            s.control_panel.visible = false
+            s.control_panel_button.widget.widget.widget.text = '◀'
+        end
+    end)
+
+    return(s.control_panel_button)
+end
+
+--control_panel_widget = require('modules.widgets.control_panel')
+
+--- TAGLIST ---
+local awidget = {}
+function awidget.taglist(s)
+    local taglist = awful.widget.taglist {
+        screen  = s,
+        filter  = awful.widget.taglist.filter.all,
+        buttons = taglist_buttons,
+
+        style  = {
+            shape = rounded_rectangle(8),
+            font  = "Source Code Pro black 16"
+        },
+    }
+
+    return(taglist)
+end
+
+--- TASKLIST ---
+function awidget.tasklist(s)
+    local tasklist = awful.widget.tasklist {
+        screen   = s,
+        filter   = awful.widget.tasklist.filter.currenttags,
+        buttons  = tasklist_buttons,
+        layout   = {
+            --spacing_widget = {
+            --    {
+            --        forced_width  = 5,
+            --        forced_height = 24,
+            --        thickness     = 1,
+            --        color         = '#000',
+            --        widget        = wibox.widget.separator
+            --    },
+            --    valign = 'center',
+            --    halign = 'center',
+            --    widget = wibox.container.place,
+            --},
+            --spacing = 10,
+            layout  = wibox.layout.fixed.horizontal
+        },
+        -- Notice that there is *NO* wibox.wibox prefix, it is a template,
+        -- not a widget instance.
+        widget_template = {
+            {
+                {
+                    {
+                        {
+                            {
+                                id     = 'clienticon',
+                                widget = awful.widget.clienticon,
+                            },
+                            left   = 10,
+                            right  = 10,
+                            top    = 4,
+                            bottom = 4,
+                            widget = wibox.container.margin,
+                        },
+                        --wibox.widget.base.make_widget(),
+                        id     = 'background_role',
+                        shape  = rounded_rectangle(20),
+                        widget = wibox.container.background,
+                    },
+                    shape              = rounded_rectangle(20),
+                    shape_border_width = 1,
+                    shape_border_color = '#d8dee9',
+                    widget             = wibox.container.background,
+                },
+                margins = 4,
+                widget  = wibox.container.margin,
+            },
+            nil,
+            create_callback = function(self, c, index, objects) --luacheck: no unused args
+                self:get_children_by_id('clienticon')[1].client = c
+            end,
+            layout = wibox.layout.align.vertical,
+        },
+    }
+
+    return(tasklist)
+end
 
 --- SYSTEM TRAY ---
 
@@ -534,7 +821,7 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    awful.tag({ "1\n", "2\n", "3\n", "4\n", "5\n", "6\n", "7\n", "8\n", "9\n" }, s, awful.layout.layouts[1])
+    awful.tag({ ' 1 ', ' 2 ', ' 3 ', ' 4 ', ' 5 ', ' 6 ', ' 7 ', ' 8 ', ' 9 ', }, s, awful.layout.layouts[1])
 
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
@@ -649,14 +936,12 @@ awful.screen.connect_for_each_screen(function(s)
     })
 
     -- Create the left wibar
-    s.leftwibar  = awfulwibar({
-        position = "left",
-        stretch  = true,
-        screen   = s,
-        width    = 48
-    })
-
-    s.menu = menubutton
+    --s.leftwibar  = awfulwibar({
+    --    position = "left",
+    --    stretch  = true,
+    --    screen   = s,
+    --    width    = 48
+    --})
 
     local textclock = wibox.widget.textclock('<span font="Source Sans Pro bold 11">  %H:%M</span>')
 
@@ -670,50 +955,58 @@ awful.screen.connect_for_each_screen(function(s)
         end
     end
 
+    s.kbdlayout = kbdlayout
+
     -- Add widgets to the top wibar
     s.topwibar:setup {
         direction = "east",
         layout    = wibox.layout.align.horizontal,
         {
-            layout = wibox.layout.align.horizontal,
+            menubutton(s),
+            awidget.tasklist(s),
+            --s.mytasklist,
             --mylauncher,
             s.mypromptbox,
-            s.mytasklist,
+            margins = 4,
+            widget  = wibox.container.margin,
+            layout  = wibox.layout.align.horizontal,
         },
         {
             layout = wibox.layout.align.horizontal,
         },
         {
 --            awful.titlebar.widget.closebutton(c),
+            awidget.taglist(s),
+            s.kbdlayout,
             volume_button,
-            calendar_button,
-            --systray,
+            calendar_widget(s),
+            control_panel_widget(s),
             local_systray(),
+            s.mylayoutbox,
             layout = wibox.layout.fixed.horizontal,
         },
     }
 
     -- Add widgets to the left wibar
-    s.leftwibar:setup {
-        direction = "east",
-        layout    = wibox.layout.align.vertical,
-        { -- Left widgets
-            layout = wibox.layout.fixed.vertical,
-            s.menu,
-            s.mytaglist,
-        },
-        {
---            s.mytasklist, -- Middle widget
-            widget  = wibox.widget.separator,
-            visible = false
-        },
-        { -- Right widgets
-            layout = wibox.layout.fixed.vertical,
---            mykeyboardlayout,
-            textclock,
-            s.mylayoutbox,
-        },
-    }
+    --s.leftwibar:setup {
+    --    direction = "east",
+    --    layout    = wibox.layout.align.vertical,
+    --    { -- Left widgets
+    --        layout = wibox.layout.fixed.vertical,
+    --        --menubutton(s),
+    --        --s.mytaglist,
+    --    },
+    --    {
+--  --          s.mytasklist, -- Middle widget
+    --        widget  = wibox.widget.separator,
+    --        visible = false
+    --    },
+    --    { -- Right widgets
+    --        layout = wibox.layout.fixed.vertical,
+    --        textclock,
+    --        --s.mylayoutbox,
+    --    },
+    --}
 end)
 -- }}}
 
@@ -1012,6 +1305,10 @@ awful.rules.rules = {
       properties = { opacity = 1, maximized = false, floating = false }
     },
 
+    { rule = { class = "portal2_linux" },
+      properties = { opacity = 1, maximized = false, floating = true, titlebars_enabled = false }
+    },
+
     { rule = { class = "Gnome-flashback" },
       properties = { sticky = true, border_width = 0 }
     },
@@ -1070,9 +1367,7 @@ client.connect_signal("request::titlebars", function(c)
             awful.titlebar.widget.closebutton    (c),
             layout = wibox.layout.fixed.horizontal()
         },
-        shape = function(cr,w,h)
-            gears.shape.rounded_rect(cr,w,h,20)
-        end;
+        shape = rounded_rectangle(20);
         layout = wibox.layout.align.horizontal
     }
 end)
@@ -1081,19 +1376,21 @@ end)
 -- volume widget on the correct screen.
 client.connect_signal("mouse::enter", function(c)
     c:emit_signal("request::activate", "mouse_enter", {raise = false})
-    
-    if volume_box_aa.visible == false then
-        awful.placement.top_right(volume_box_aa, { margins = {top = 48, right = 16}, parent = awful.screen.focused()})
-    end
+
+--    if calendar.visible == false then
+--        awful.placement.top_right(calendar, { margins = {top = 48, right = 16}, parent = awful.screen.focused()})
+--    end
 end)
 
-client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
+client.connect_signal("focus", function(c)   c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
 
 -- Autostart
 --dofile(awful.util.getdir("config") .. "config/autostart.lua")
-awful.spawn("hsetroot -add '#2e3440' -add '#eceff4' -gradient 180")
+--awful.spawn("hsetroot -add '#2e3440' -add '#eceff4' -gradient 180")
+awful.spawn('nitrogen --restore')
+awful.spawn.with_shell('picom --config ' .. config_dir .. '/other/picom/picom.conf&')
 --naughty.notify { text = autostart }
 
 ----------------------------------------------------------------------------------------

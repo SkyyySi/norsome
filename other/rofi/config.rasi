@@ -6,7 +6,7 @@
 configuration {
 /*	theme:                     "Nordic"; */
 	location:                    1;
-	xoffset:                     48;
+	xoffset:                     0;
 	yoffset:                     40;
 	modi:                        "drun,window,ssh,run";
 	font:                        "Source Sans Pro Semibold 16";

@@ -2,35 +2,68 @@
 -- Nordic awesome theme --
 --------------------------
 
+local gfs          = require("gears.filesystem")
 local theme_assets = require("beautiful.theme_assets")
-local xresources = require("beautiful.xresources")
-local dpi = xresources.apply_dpi
-
-local gfs = require("gears.filesystem")
-local themes_path = gfs.get_themes_dir()
+local xresources   = require("beautiful.xresources")
+local dpi          = xresources.apply_dpi
+local themes_path  = gfs.get_themes_dir()
 
 local theme = {}
+-- The names are actually nord0, nord1, ..., nord15, but lua does
+-- not allow for variable names to start with numbers. Thus, letters
+-- are used here instead.
+theme.nord0  = '#2E3440' -- Polar Night 1
+theme.nord1  = '#3B4252' -- Polar Night 2
+theme.nord2  = '#434C5E' -- Polar Night 3
+theme.nord3  = '#4C566A' -- Polar Night 4
+theme.nord4  = '#D8DEE9' -- Snow Storm 1
+theme.nord5  = '#E5E9F0' -- Snow Storm 2
+theme.nord6  = '#ECEFF4' -- Snow Storm 3
+theme.nord7  = '#8FBCBB' -- Frost 1
+theme.nord8  = '#88C0D0' -- Frost 2
+theme.nord9  = '#81A1C1' -- Frost 3
+theme.nord10 = '#5E81AC' -- Frost 4
+theme.nord11 = '#BF616A' -- Aurora 1
+theme.nord12 = '#D08770' -- Aurora 2
+theme.nord13 = '#EBCB8B' -- Aurora 3
+theme.nord14 = '#A3BE8C' -- Aurora 4
+theme.nord15 = '#B48EAD' -- Aurora 5
 
-theme.font          = "Source Sans Pro 11"
+theme.font           = "Source Sans Pro 11"
 
-theme.bg_normal     = "#2e3440"
-theme.bg_focus      = "#5e81ac"
-theme.bg_urgent     = "#d08770"
-theme.bg_minimize   = "#3b4252"
-theme.bg_systray    = theme.bg_normal
+theme.bg_normal      = theme.nord0
+theme.bg_focus       = theme.nord10
+theme.bg_urgent      = theme.nord12
+theme.bg_minimize    = theme.nord1
+theme.bg_systray     = theme.bg_normal
 
-theme.fg_normal     = "#d8dee9"
-theme.fg_focus      = "#d8dee9"
-theme.fg_urgent     = "#2e3440"
-theme.fg_minimize   = "#d8dee9"
+theme.fg_normal      = theme.nord4
+theme.fg_focus       = theme.nord4
+theme.fg_urgent      = theme.nord0
+theme.fg_minimize    = theme.nord4
 
-theme.useless_gap   = dpi(0)
-theme.border_width  = dpi(1)
-theme.border_normal = "#4c566a"
-theme.border_focus  = "#d8dee9"
-theme.border_marked = "#d8dee9"
+theme.useless_gap    = dpi(2)
+theme.border_width   = dpi(2)
+theme.border_normal  = theme.nord3
+theme.border_focus   = theme.nord4
+theme.border_marked  = theme.nord4
 
-theme.bg_systray           = '#4C566A'
+--theme.button_normal  = theme.nord11        -- default
+theme.button_normal  = theme.nord1        -- default
+theme.button_enter   = theme.nord2        -- hovered
+theme.button_press   = theme.nord3        -- pressed
+theme.button_release = theme.button_enter -- released
+
+theme.bg_systray     = theme.button_normal or theme.nord1
+
+theme.taglist_bg_empty     = theme.nord1
+theme.taglist_bg_occupied  = theme.nord2
+theme.taglist_disable_icon = true
+theme.taglist_font         = 'Source Code Pro black 16'
+--theme.taglist_shape        = gears.shape.rounded_bar
+
+theme.control_panel_bg = theme.nord1 .. 'D0'
+
 theme.systray_icon_spacing = dpi(10)
 theme.systray_icon_size    = dpi(15)
 
@@ -84,49 +117,49 @@ theme.titlebar_minimize_button_focus  = themes_path.."default/titlebar/minimize_
 
 theme.titlebar_ontop_button_normal_inactive = themes_path.."default/titlebar/ontop_normal_inactive.png"
 theme.titlebar_ontop_button_focus_inactive  = themes_path.."default/titlebar/ontop_focus_inactive.png"
-theme.titlebar_ontop_button_normal_active = themes_path.."default/titlebar/ontop_normal_active.png"
-theme.titlebar_ontop_button_focus_active  = themes_path.."default/titlebar/ontop_focus_active.png"
+theme.titlebar_ontop_button_normal_active   = themes_path.."default/titlebar/ontop_normal_active.png"
+theme.titlebar_ontop_button_focus_active    = themes_path.."default/titlebar/ontop_focus_active.png"
 
 theme.titlebar_sticky_button_normal_inactive = themes_path.."default/titlebar/sticky_normal_inactive.png"
 theme.titlebar_sticky_button_focus_inactive  = themes_path.."default/titlebar/sticky_focus_inactive.png"
-theme.titlebar_sticky_button_normal_active = themes_path.."default/titlebar/sticky_normal_active.png"
-theme.titlebar_sticky_button_focus_active  = themes_path.."default/titlebar/sticky_focus_active.png"
+theme.titlebar_sticky_button_normal_active   = themes_path.."default/titlebar/sticky_normal_active.png"
+theme.titlebar_sticky_button_focus_active    = themes_path.."default/titlebar/sticky_focus_active.png"
 
 theme.titlebar_floating_button_normal_inactive = themes_path.."default/titlebar/floating_normal_inactive.png"
 theme.titlebar_floating_button_focus_inactive  = themes_path.."default/titlebar/floating_focus_inactive.png"
-theme.titlebar_floating_button_normal_active = themes_path.."default/titlebar/floating_normal_active.png"
-theme.titlebar_floating_button_focus_active  = themes_path.."default/titlebar/floating_focus_active.png"
+theme.titlebar_floating_button_normal_active   = themes_path.."default/titlebar/floating_normal_active.png"
+theme.titlebar_floating_button_focus_active    = themes_path.."default/titlebar/floating_focus_active.png"
 
 theme.titlebar_maximized_button_normal_inactive = themes_path.."default/titlebar/maximized_normal_inactive.png"
 theme.titlebar_maximized_button_focus_inactive  = themes_path.."default/titlebar/maximized_focus_inactive.png"
-theme.titlebar_maximized_button_normal_active = themes_path.."default/titlebar/maximized_normal_active.png"
-theme.titlebar_maximized_button_focus_active  = themes_path.."default/titlebar/maximized_focus_active.png"
+theme.titlebar_maximized_button_normal_active   = themes_path.."default/titlebar/maximized_normal_active.png"
+theme.titlebar_maximized_button_focus_active    = themes_path.."default/titlebar/maximized_focus_active.png"
 
 --theme.wallpaper = themes_path.."default/background.png"
 
 -- You can use your own layout icons like this:
-theme.layout_fairh = themes_path.."default/layouts/fairhw.png"
-theme.layout_fairv = themes_path.."default/layouts/fairvw.png"
-theme.layout_floating  = themes_path.."default/layouts/floatingw.png"
-theme.layout_magnifier = themes_path.."default/layouts/magnifierw.png"
-theme.layout_max = themes_path.."default/layouts/maxw.png"
+theme.layout_fairh      = themes_path.."default/layouts/fairhw.png"
+theme.layout_fairv      = themes_path.."default/layouts/fairvw.png"
+theme.layout_floating   = themes_path.."default/layouts/floatingw.png"
+theme.layout_magnifier  = themes_path.."default/layouts/magnifierw.png"
+theme.layout_max        = themes_path.."default/layouts/maxw.png"
 theme.layout_fullscreen = themes_path.."default/layouts/fullscreenw.png"
 theme.layout_tilebottom = themes_path.."default/layouts/tilebottomw.png"
 theme.layout_tileleft   = themes_path.."default/layouts/tileleftw.png"
-theme.layout_tile = themes_path.."default/layouts/tilew.png"
-theme.layout_tiletop = themes_path.."default/layouts/tiletopw.png"
-theme.layout_spiral  = themes_path.."default/layouts/spiralw.png"
-theme.layout_dwindle = themes_path.."default/layouts/dwindlew.png"
-theme.layout_cornernw = themes_path.."default/layouts/cornernww.png"
-theme.layout_cornerne = themes_path.."default/layouts/cornernew.png"
-theme.layout_cornersw = themes_path.."default/layouts/cornersww.png"
-theme.layout_cornerse = themes_path.."default/layouts/cornersew.png"
+theme.layout_tile       = themes_path.."default/layouts/tilew.png"
+theme.layout_tiletop    = themes_path.."default/layouts/tiletopw.png"
+theme.layout_spiral     = themes_path.."default/layouts/spiralw.png"
+theme.layout_dwindle    = themes_path.."default/layouts/dwindlew.png"
+theme.layout_cornernw   = themes_path.."default/layouts/cornernww.png"
+theme.layout_cornerne   = themes_path.."default/layouts/cornernew.png"
+theme.layout_cornersw   = themes_path.."default/layouts/cornersww.png"
+theme.layout_cornerse   = themes_path.."default/layouts/cornersew.png"
 
 -- Generate Awesome icon:
 --[[theme.awesome_icon = theme_assets.awesome_icon(
     theme.menu_height, theme.bg_focus, theme.fg_focus
 )]]--
-theme.awesome_icon = "/home/simon/Dokumente/svg/QRLinux-logo.svg"
+theme.awesome_icon = theme_dir .. "/qrlinux/QRLinux-logo.svg"
 
 -- Define the icon theme for application icons. If not set then the icons
 -- from /usr/share/icons and /usr/share/icons/hicolor will be used.

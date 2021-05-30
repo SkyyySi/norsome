@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="512"
+   height="512"
+   viewBox="0 0 135.46666 135.46666"
+   version="1.1"
+   id="svg1158"
+   inkscape:version="1.0.2 (e86c870879, 2021-01-15, custom)"
+   sodipodi:docname="QRLinux-logo-nobg.svg">
+  <defs
+     id="defs1152" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1"
+     inkscape:cx="258.82697"
+     inkscape:cy="275.69612"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1868"
+     inkscape:window-height="1044"
+     inkscape:window-x="1968"
+     inkscape:window-y="32"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata1155">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       fill-rule="evenodd"
+       clip-rule="evenodd"
+       d="m 49.345994,53.64748 c -9.913361,3.465645 -17.023958,12.898144 -17.023958,23.990562 0,14.033742 11.379488,25.409608 25.416852,25.409608 11.271728,0 20.830106,-7.335183 24.159003,-17.491234 h 11.03085 c 2.437804,0 4.41378,-1.975068 4.41378,-4.41197 V 41.986357 c 0,-2.436908 -1.975976,-4.411978 -4.41378,-4.411978 H 53.758873 c -2.43691,0 -4.412879,1.97507 -4.412879,4.411978 z m 8.392894,-1.418133 c -2.941315,0 -5.765814,0.498971 -8.392894,1.418133 v 27.496966 c 0,2.436902 1.975969,4.41197 4.412879,4.41197 h 28.139018 c 0.816827,-2.491241 1.258755,-5.153643 1.258755,-7.918374 0,-14.032832 -11.380396,-25.408695 -25.417758,-25.408695 z"
+       fill="#C4C4C4"
+       id="path8"
+       style="fill:#eceff4;fill-opacity:1;stroke-width:0.0905574" />
+  </g>
+</svg>

@@ -1,5 +1,7 @@
 local menubutton
 function menubutton(s)
+    local s = s or awful.screen.focused()
+
     local terminal    = "termite"
     local webbrowser  = "firefox"
     local filemanager = "pcmanfm"
@@ -26,7 +28,7 @@ function menubutton(s)
     local awesome_menu = awful.menu({ items = { { "Awesome", menu_awesome, beautiful.awesome_icon },
                                         { "Power", menu_power },
     --                                       { "Applications", xdgmenu },
-                                        { "––––––––––––––––––––" },
+                                        { wibox.widget.separator({thickness=2}) },
                                         { "Terminal", terminal },
                                         { "Web browser", webbrowser },
                                         { "File manager", filemanager },

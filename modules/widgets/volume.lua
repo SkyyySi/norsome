@@ -1,8 +1,12 @@
 local rounded_rectangle = require('rounded_rectangle')
+local infobubble        = require('infobubble')
 local buttonify         = require('buttonify')
 
 local s = s or awful.screen.focused()
 function s.volume_button(s)
+    local arrow_width = 10
+    s.shape = infobubble(20, arrow_width)
+
     -- Read the current pulse audio volume using the pamixer command
     function s.get_volume(f)
         awful.spawn.easy_async_with_shell('pamixer --get-volume', function(vol)
@@ -127,38 +131,26 @@ function s.volume_button(s)
             end
         end)
 
-        s.volslider:connect_signal("mouse::enter", function(c)
-            c.handle_color = beautiful.nord7 or '#8FBCBB'
-        end)
-        s.volslider:connect_signal("mouse::leave", function(c)
-            c.handle_color = beautiful.nord4 or '#D8DEE9'
-        end)
-        s.volslider:connect_signal("button::press", function(c)
-            c.handle_color = beautiful.nord8 or '#88C0D0'
-        end)
-        s.volslider:connect_signal("button::release", function(c)
-            c.handle_color = beautiful.nord7 or '#8FBCBB'
-        end)
+        s.volslider:connect_signal('mouse::enter',    function(c) c.handle_color = beautiful.nord7 or '#8FBCBB' end)
+        s.volslider:connect_signal('mouse::leave',    function(c) c.handle_color = beautiful.nord4 or '#D8DEE9' end)
+        s.volslider:connect_signal('button::press',   function(c) c.handle_color = beautiful.nord8 or '#88C0D0' end)
+        s.volslider:connect_signal('button::release', function(c) c.handle_color = beautiful.nord7 or '#8FBCBB' end)
 
         --- ANTI-ALIASING ---
 
         -- Create the box
-        s.volume_box_aa = wibox({
-            ontop   = true,
-            type    = "dialog",
-        --    x       = 690,
-        --    y       = 1060,
-            shape = function(cr,w,h)
-                gears.shape.rounded_rect(cr,w,h,20)
-            end;
+        s.volume_box_aa = wibox {
+            ontop     = true,
+            type      = "dialog",
             placement = awful.placement.centered,
-            height    = 50,
+            height    = 50 + arrow_width,
             width     = 300,
+            shape     = s.shape,
             visible   = false,
-        })
+        }
 
         -- Place it at the center of the screen
-        awful.placement.centered(s.volume_box_aa)
+        --awful.placement.centered(s.volume_box_aa)
 
         -- Set bg and fg
         s.volume_box_aa.bg = '#2e344080'
@@ -183,25 +175,32 @@ function s.volume_button(s)
         s.volume_box_aa:setup {
             {
                 {
-                    volume_box_content,
-                    layout = wibox.layout.align.horizontal
+                    {
+                        volume_box_content,
+                        layout = wibox.layout.align.horizontal
+                    },
+                    halign    = 'center',
+                    valign    = 'center',
+                    layout    = wibox.layout.align.horizontal,
+                    placement = awful.placement.centered,
+                    widget    = wibox.container.place,
                 },
-                halign    = 'center',
-                valign    = 'center',
-                layout    = wibox.layout.align.horizontal,
-                placement = awful.placement.centered,
-                widget    = wibox.container.place,
+                top    = arrow_width,
+                widget = wibox.container.margin,
             },
             shape_border_width = 2,
             shape_border_color = '#FFFFFF',
-            shape  = rounded_rectangle(20),
-            widget = wibox.widget.background,
+            shape              = s.shape,
+            widget             = wibox.widget.background,
         }
 
         s.volume_button:connect_signal("button::release", function(c, _, _, button)
             if button == 1 then
                 s.update_volume()
                 s.volume_box_aa.visible = not s.volume_box_aa.visible
+
+                center = mouse.current_widget_geometry.x - (s.volume_box_aa.width / 2 or 0)
+                awful.placement.top_left(s.volume_box_aa, { margins = {top = 48, left = center }, parent = s })
             elseif button == 2 then
                 awful.spawn('pavucontrol')
             end
@@ -217,7 +216,7 @@ function s.volume_button(s)
             s.update_volume(vol)
         end)
 
-        awful.placement.top_right(s.volume_box_aa, { margins = {top = 48, right = 16}, parent = s})
+        --awful.placement.top_right(s.volume_box_aa, { margins = {top = 48, right = 16}, parent = s})
         return(s.volume_button)
     end)
 

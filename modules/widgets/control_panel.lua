@@ -8,10 +8,9 @@ function control_panel_widget(s)
     local width = 400
 
     -- Read the current pulse audio volume using the pamixer command
-    local get_volume
-    function get_volume(f)
+    function s.get_volume(f)
         awful.spawn.easy_async_with_shell('pamixer --get-volume', function(vol)
-            volume = tonumber(vol)
+            local volume = tonumber(vol)
             f(volume)
         end)
     end
@@ -48,6 +47,23 @@ function control_panel_widget(s)
         maximum             = 100,
         widget              = wibox.widget.slider,
     }
+
+    s.get_volume(function(v)
+        --naughty.notify({text = tostring(v)})
+        s.volume_slider = wibox.widget {
+            bar_shape           = gears.shape.rounded_bar,
+            bar_height          = 4,
+            bar_color           = beautiful.nord8,
+            handle_color        = beautiful.nord4,
+            handle_shape        = gears.shape.circle,
+            handle_border_color = beautiful.nord3,
+            handle_border_width = 2,
+            value               = v,
+            minimum             = 0,
+            maximum             = 100,
+            widget              = wibox.widget.slider,
+        }
+    end)
 
     s.volume_slider:connect_signal('property::value', function(c)
         awful.spawn.with_shell('pamixer --set-volume ' .. c.value)

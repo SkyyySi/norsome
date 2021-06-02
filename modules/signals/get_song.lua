@@ -1,18 +1,19 @@
 local username = os.getenv('USER')
+local confdir  = awful.util.getdir('config')
 
-awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^' .. awful.util.getdir('config') .. 'scripts/get_song_title.sh -t -f'}, function()
+awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^' .. confdir .. 'scripts/get_song_title.sh -t -f'}, function()
 	awful.spawn.with_line_callback(awful.util.getdir('config') .. 'scripts/get_song_title.sh -t -f', {stdout = function(title)
 		awesome.emit_signal('qrlinux::media::get_song_title', title)
 	end})
 end)
 
-awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^' .. awful.util.getdir('config') .. 'scripts/get_song_title.sh -a -f'}, function()
+awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^' .. confdir .. 'scripts/get_song_title.sh -a -f'}, function()
 	awful.spawn.with_line_callback(awful.util.getdir('config') .. 'scripts/get_song_title.sh -a -f', {stdout = function(artist)
 		awesome.emit_signal('qrlinux::media::get_song_artist', artist)
 	end})
 end)
 
-awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^' .. awful.util.getdir('config') .. 'scripts/get_song_title.sh -c -f'}, function()
+awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^' .. confdir .. 'scripts/get_song_title.sh -c -f'}, function()
 	awful.spawn.with_line_callback(awful.util.getdir('config') .. 'scripts/get_song_title.sh -c -f', {stdout = function(cover)
 		awesome.emit_signal('qrlinux::media::get_song_cover', cover)
 	end})
@@ -21,13 +22,12 @@ end)
 awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^playerctl status -F'}, function()
 	awful.spawn.with_line_callback('playerctl status -F', {stdout = function(s)
 		local status = false
-		if s == 'Playing' then
-			status = true
-		end
+		if s == 'Playing' then status = true end
 		awesome.emit_signal('qrlinux::media::get_song_status', status)
 	end})
 end)
 
+--[[
 --awesome.connect_signal('qrlinux::media::get_song_title', function(song)
 --	awesome.connect_signal('qrlinux::media::get_song_artist', function(artist)
 --		naughty.notify({text = 'Now playing: "' .. tostring(song) .. '" by ' .. tostring(artist)})
@@ -62,3 +62,4 @@ function get_status(f)
 		--naughty.notify({text = 'Status: ' .. status})
 	end)
 end
+--]]

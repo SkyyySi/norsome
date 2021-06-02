@@ -126,6 +126,7 @@ require('signals.get_song')
 
 -- Modules
 local rounded_rectangle = require('rounded_rectangle')
+local infobubble        = require('infobubble')
 local rounded_wibox     = require('rounded_wibox')
 local buttonify         = require('buttonify')
 
@@ -607,42 +608,11 @@ end)
 
 local awidget = {}
 
---- MUSIC CONTROL ---
-local music_widget = require('widgets.music')
-
---- VOLUME CONTROL ---
-local volume_widget = require('widgets.volume')
-
---- CALENDAR ---
-local calendar_widget = require('widgets.calendar')
-
---- CONTROL PANEL ---
-local control_panel_widget = require('widgets.control_panel')
-
---- KEYBOARD LAYOUT ---
-function awidget.kbdlayout(s)
-    local widget = wibox.widget {
-        {
-            {
-                {
-                    awful.widget.keyboardlayout(),
-                    layout = wibox.layout.align.horizontal,
-                },
-                margins = 4,
-                widget  = wibox.container.margin,
-            },
-            bg                 = beautiful.nord1,
-            shape              = gears.shape.rounded_bar,
-            shape_border_width = 1,
-            shape_border_color = beautiful.nord4,
-            widget             = wibox.container.background,
-        },
-        margins = 4,
-        widget  = wibox.container.margin,
-    }
-    --buttonify({widget = widget.widget})
-    return(widget)
-end
+local music_widget         = require('widgets.music')         -- MUSIC CONTROL
+local volume_widget        = require('widgets.volume')        -- VOLUME CONTROL
+local calendar_widget      = require('widgets.calendar')      -- CALENDAR
+local control_panel_widget = require('widgets.control_panel') -- CONTROL PANEL
+awidget.kbdlayout          = require('widgets.keyboard')      -- KEYBOARD LAYOUT
 
 --- TAGLIST ---
 function awidget.taglist(s)
@@ -975,11 +945,10 @@ awful.screen.connect_for_each_screen(function(s)
             layout = wibox.layout.fixed.horizontal,
         },
         {
---            awful.titlebar.widget.closebutton(c),
-            volume_widget(s),
             music_widget(s),
+            volume_widget(s),
             awidget.taglist(s),
-            awidget.kbdlayout(s),
+            awidget.kbdlayout(),
             calendar_widget(s),
             awidget.systray(),
             control_panel_widget(s),
@@ -1261,6 +1230,7 @@ awful.rules.rules = {
         class = {
           "Arandr",
           "Blueman-manager",
+          "Gcr-prompter",
           "Gpick",
           "Kruler",
           "MessageWin",  -- kalarm.
@@ -1388,18 +1358,20 @@ local true_useless_gap = beautiful.useless_gap
 screen.connect_signal("arrange", function (s)
     local layout = s.selected_tag.layout.name
     local is_single_client = #s.clients == 1
-    --for _, c in pairs(s.clients) do
-    --    if (layout == 'floating' or layout == 'max') or is_single_client or c.floating or c.maximized then
-    --        beautiful.useless_gap = 0
-    --    else
-    --        beautiful.useless_gap = true_useless_gap
-    --    end
-    --end
+    for _, c in pairs(s.clients) do
+        if (layout == 'floating' or layout == 'max') then
+            beautiful.useless_gap = 0
+        else
+            beautiful.useless_gap = true_useless_gap
+        end
+    end
 
     for _, c in pairs(s.clients) do
         if layout == 'floating' or c.floating and not c.maximized then
+            awful.titlebar.show(c)
    			awful.spawn("xprop -id " .. c.window .. " -f _COMPTON_SHADOW 32c -set _COMPTON_SHADOW 1", false)
         else
+            awful.titlebar.hide(c)
     		awful.spawn("xprop -id " .. c.window .. " -f _COMPTON_SHADOW 32c -set _COMPTON_SHADOW 0", false)
         end
     end
@@ -1415,3 +1387,15 @@ awful.spawn.with_shell('picom --config ' .. config_dir .. '/other/picom/picom.co
 --naughty.notify { text = autostart }
 
 ----------------------------------------------------------------------------------------
+
+--[[
+gears.timer {
+    autostart = true,
+    callback  = function()
+        local widget   = mouse.current_widget
+        local x_center = mouse.current_widget_geometry['x'] / 2 + mouse.current_wibox['x']
+        --naughty.notify({ text = 'Widget ' .. tostring(widget) .. ' has a geometry of X:' .. tostring(geometry['x']) .. ', Y:' .. tostring(geometry['y']) })
+        naughty.notify({ text = 'The center of widget ' .. tostring(widget) .. ' is ' .. tostring(x_center) })
+    end
+}
+--]]

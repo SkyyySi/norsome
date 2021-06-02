@@ -219,7 +219,7 @@ function music_button(s)
 					s.box.visible = not s.box.visible
 				elseif button == 3 then
 					awful.spawn('playerctl play-pause')
-					s.content.widget.text = print_status_sym(status, true) .. song
+					s.content.widget.text = print_status_sym(status, true) .. song .. ' '
 				end
 			end)
 		end)

@@ -4,8 +4,8 @@ local buttonify         = require('buttonify')
 
 local s = s or awful.screen.focused()
 function s.volume_button(s)
-    local arrow_width = 10
-    s.shape = infobubble(20, arrow_width)
+    local arrow_width = dpi(10)
+    s.shape = infobubble(dpi(20), arrow_width)
 
     -- Read the current pulse audio volume using the pamixer command
     function s.get_volume(f)
@@ -38,16 +38,16 @@ function s.volume_button(s)
                     s.volume_button_text,
                     layout  = wibox.layout.align.horizontal,
                 },
-                top = 4, bottom = 4, left = 8, right = 8,
+                top = dpi(4), bottom = dpi(4), left = dpi(8), right = dpi(8),
                 widget = wibox.container.margin
             },
             bg = beautiful.button_normal,
-            shape_border_width = 1,
+            shape_border_width = dpi(1),
             shape_border_color = beautiful.nord4 or '#d8dee9',
             shape = gears.shape.rounded_bar,
             widget = wibox.container.background,
         },
-        margins = 4,
+        margins = dpi(4),
         widget = wibox.container.margin
     }
 
@@ -55,19 +55,19 @@ function s.volume_button(s)
         s.volslider = wibox.widget {
             bar_color           = beautiful.nord8 or '#88C0D0',
             bar_shape           = gears.shape.rounded_rect,
-            bar_height          = 2,
+            bar_height          = dpi(2),
             handle_color        = beautiful.nord4 or '#D8DEE9',
             handle_border_color = beautiful.nord3 or '#4C566A',
-            handle_border_width = 2,
+            handle_border_width = dpi(2),
             handle_shape        = gears.shape.circle,
-            handle_width        = 25,
+            handle_width        = dpi(25),
 
             value               = volume,
             minimum             = 0,
             maximum             = 100,
 
-            forced_width        = 200,
-            forced_height       = 50,
+            forced_width        = dpi(200),
+            forced_height       = dpi(50),
 
             widget              = wibox.widget.slider,
         }
@@ -85,7 +85,7 @@ function s.volume_button(s)
                         s.voltext,
                         layout = wibox.layout.align.horizontal,
                     },
-                    margins = 4,
+                    margins = dpi(4),
                     widget = wibox.container.margin
                 },
                 {
@@ -93,7 +93,7 @@ function s.volume_button(s)
                         s.volslider,
                         layout = wibox.layout.align.horizontal,
                     },
-                    top = 4, bottom = 4, right = 8,
+                    top = dpi(4), bottom = dpi(4), right = dpi(8),
                     widget = wibox.container.margin
                 },
                 layout  = wibox.layout.align.horizontal,
@@ -143,8 +143,8 @@ function s.volume_button(s)
             ontop     = true,
             type      = "dialog",
             placement = awful.placement.centered,
-            height    = 50 + arrow_width,
-            width     = 300,
+            height    = dpi(50) + arrow_width,
+            width     = dpi(300),
             shape     = s.shape,
             visible   = false,
         }
@@ -166,7 +166,7 @@ function s.volume_button(s)
                     s.volume_slider,
                     layout = wibox.layout.align.horizontal,
                 },
-                margins   = 32,
+                margins   = dpi(32),
                 layout    = wibox.layout.align.horizontal,
                 widget    = wibox.container.margin,
         }
@@ -188,7 +188,7 @@ function s.volume_button(s)
                 top    = arrow_width,
                 widget = wibox.container.margin,
             },
-            shape_border_width = 2,
+            shape_border_width = dpi(2),
             shape_border_color = '#FFFFFF',
             shape              = s.shape,
             widget             = wibox.widget.background,

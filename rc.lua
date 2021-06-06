@@ -17,7 +17,7 @@ menubar       = require('menubar')
 hotkeys_popup = require('awful.hotkeys_popup')
 xresources    = require('beautiful.xresources')
 dpi           = xresources.apply_dpi
---archmenu      = require('archmenu')
+xdg_menu      = require('archmenu')
 require('awful.autofocus')
 
 -- Enable hotkeys help widget for VIM and other apps
@@ -37,7 +37,7 @@ dofile(awful.util.getdir("config") .. "config/error-handler.lua")
 theme       = 'nord'
 terminal    = 'alacritty'
 webbrowser  = 'firefox'
-filemanager = 'pcmanfm'
+filemanager = 'pcmanfm-qt'
 editor      = 'code'
 editor_cmd  = editor
 config_dir  = awful.util.getdir('config')
@@ -86,7 +86,7 @@ awful.layout.layouts = {
 
 -- {{{ Menu
 -- Generate an xdg app menu
---awful.spawn.with_shell("xdg_menu --format awesome --root-menu /etc/xdg/menus/arch-applications.menu > ~/.config/awesome/archmenu.lua")
+awful.spawn.with_shell('xdg_menu --format awesome --root-menu /etc/xdg/menus/arch-applications.menu > ~/.config/awesome/archmenu.lua')
 
 -- Create a launcher widget and a main menu
 local menu_awesome = {
@@ -106,9 +106,9 @@ local menu_power = {
     { "Hibernate",    "systemctl hibernate" },
 }
 
-local awesome_menu = awful.menu({ items = { { "Awesome", menu_awesome, beautiful.awesome_icon },
+awesome_menu = awful.menu({ items = { { "Awesome", menu_awesome, beautiful.awesome_icon },
                                        { "Power", menu_power },
---                                       { "Applications", xdgmenu },
+                                       { "Applications", xdgmenu },
                                        { "––––––––––––––––––––" },
                                        { "Terminal", terminal },
                                        { "Web browser", webbrowser },
@@ -131,7 +131,7 @@ local rounded_wibox     = require('rounded_wibox')
 local buttonify         = require('buttonify')
 
 -- Widgets
-local menubutton        = require('menubutton')
+--local menubutton        = require('widgets.menubutton')
 
 ----------------------------------------------------------------------------------------------------------------------------------
 -- Closable wibox
@@ -429,14 +429,14 @@ function awedock(arg)
                     resize = true,
                     widget = wibox.widget.imagebox,
                 },
-                margins = 2,
+                margins = dpi(2),
                 widget  = wibox.container.margin,
             },
             bg     = '#FFFFFF40',
             shape  = rounded_rectangle(5),
             widget = wibox.container.background,
         },
-        margins = 4,
+        margins = dpi(4),
         widget  = wibox.container.margin,
     }
 
@@ -446,7 +446,7 @@ function awedock(arg)
             icon_widget,
             layout = wibox.layout.align.horizontal,
         },
-        margins = 2,
+        margins = dpi(2),
         widget  = wibox.container.margin,
     }
 
@@ -455,10 +455,10 @@ function awedock(arg)
         {
             color        = '#00000080',
             orientation  = 'horizontal',
-            thickness    = 50,
-            forced_width = 40,
+            thickness    = dpi(50),
+            forced_width = dpi(40),
             widget       = wibox.widget.separator,
-            shape        = rounded_rectangle(10),
+            shape        = rounded_rectangle(dpi(10)),
         },
         width    = width,
         height   = height,
@@ -478,7 +478,7 @@ function awedock(arg)
                     layout = wibox.layout.fixed.horizontal,
                     widgets,
                 },
-                margins = 4,
+                margins = dpi(4),
                 widget  = wibox.container.margin,
             },
             layout = wibox.layout.stack,
@@ -497,14 +497,14 @@ local icon_widget = wibox.widget {
                 resize = true,
                 widget = wibox.widget.imagebox,
             },
-            margins = 2,
+            margins = dpi(2),
             widget  = wibox.container.margin,
         },
         bg     = '#FFFFFF40',
-        shape  = rounded_rectangle(5),
+        shape  = rounded_rectangle(dpi(5)),
         widget = wibox.container.background,
     },
-    margins = 4,
+    margins = dpi(4),
     widget  = wibox.container.margin,
 }
 
@@ -546,16 +546,7 @@ end
 -- }}}
 
 
--- {{{ Wibar
--- Create a textclock widget
-mytextclock = wibox.widget.textclock()
-
--- Wallpaper
-local function set_wallpaper(s)
-    awful.spawn("nitrogen --restore")
-    --awful.spawn("hsetroot -add '#2e3440' -add '#eceff4' -gradient 180")
-end
-
+--[[
 local mediabox = wibox {
     visible = false,
     ontop   = true,
@@ -636,12 +627,13 @@ awesome.connect_signal('qrlinux::media::get_song_cover', function(cover)
         valigh = 'center',
         layout = wibox.container.place,
     }
-end)
+end) --]]
 
 ----------------------------------------------------------------------------------------------------
 --                                             WIDGETS                                            --
 ----------------------------------------------------------------------------------------------------
 
+-- {{{ Wibar
 local qrwidget = {}
 
 qrwidget.music          = require('widgets.music')          -- MUSIC CONTROL
@@ -653,6 +645,13 @@ qrwidget.taglist        = require('widgets.taglist')        -- TAGLIST
 qrwidget.tasklist       = require('widgets.tasklist')       -- TASKLIST
 qrwidget.current_layout = require('widgets.current_layout') -- CURRENT LAYOUT
 qrwidget.systray        = require('widgets.systray')        -- SYSTEM TRAY
+qrwidget.menubutton     = require('widgets.menubutton')     -- START MENU BUTTON
+
+-- Wallpaper
+local function set_wallpaper(s)
+    awful.spawn("nitrogen --restore")
+    --awful.spawn("hsetroot -add '#2e3440' -add '#eceff4' -gradient 180")
+end
 
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
@@ -672,7 +671,7 @@ awful.screen.connect_for_each_screen(function(s)
         position = "top",
         stretch  = true,
         screen   = s,
-        height   = 40
+        height   = dpi(40)
     })
 
     -- Add widgets to the top wibar
@@ -680,10 +679,10 @@ awful.screen.connect_for_each_screen(function(s)
         direction = "east",
         layout    = wibox.layout.align.horizontal,
         {
-            menubutton(s),
+            qrwidget.menubutton(s),
             qrwidget.tasklist(s),
             s.promptbox,
-            margins = 4,
+            margins = dpi(4),
             widget  = wibox.container.margin,
             layout  = wibox.layout.align.horizontal,
         },
@@ -705,8 +704,10 @@ awful.screen.connect_for_each_screen(function(s)
 end)
 -- }}}
 
+-- {{{ Mouse bindings
 require('modules.bindings.mouse.root')
 local clientbuttons = require('modules.bindings.mouse.clientbuttons')
+-- }}}
 
 -- {{{ Key bindings
 local globalkeys    = require('modules.bindings.keyboard.globalkeys')
@@ -878,7 +879,7 @@ client.connect_signal("request::titlebars", function(c)
     )
 
     local top_titlebar = awful.titlebar(c, {
-        size           = beautiful.titlebar_size or 28,
+        size           = beautiful.titlebar_size or dpi(28),
         enable_tooltip = false,
         position       = 'top',
     })
@@ -1006,7 +1007,7 @@ awful.spawn.with_shell(config_dir .. '/scripts/autostart.sh')
 --for _, c in pairs(client.get()) do
 client.connect_signal('manage', function(c)
     c:connect_signal('property::floating', function()
-        c:set_height(c.height - (beautiful.titlebar_size or 28))
+        c:set_height(c.height - (beautiful.titlebar_size or dpi(28)))
     end)
 end)
 

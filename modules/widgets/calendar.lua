@@ -4,16 +4,16 @@ local infobubble        = require('infobubble')
 function calendar_widget(s)
     local s = s or awful.screen.focused()
 
-    s.calendar = wibox({
+    s.calendar = wibox {
         ontop     = true,
         type      = 'dialog',
-        shape     = infobubble(20),--rounded_rectangle(20),
+        shape     = infobubble(dpi(20)),--rounded_rectangle(20),
         placement = awful.placement.centered,
-        height    = 240,
-        width     = 190,
+        height    = dpi(240),
+        width     = dpi(190),
         visible   = false,
         screen    = s,
-    })
+    }
 
     -- Place it at the center of the screen
     awful.placement.centered(s.calendar)
@@ -36,8 +36,8 @@ function calendar_widget(s)
                     s.calendar_box_content,
                     layout = wibox.layout.flex.horizontal
                 },
-                top    = 32,
-                left   = 10,
+                top    = dpi(32),
+                left   = dpi(10),
                 widget = wibox.container.margin
             },
             halign    = 'center',
@@ -46,9 +46,9 @@ function calendar_widget(s)
             placement = awful.placement.centered,
             widget    = wibox.container.place,
         },
-        shape_border_width = 2,
+        shape_border_width = dpi(2),
         shape_border_color = beautiful.nord4,
-        shape              = infobubble(20), --rounded_rectangle(20),
+        shape              = infobubble(dpi(20)), --rounded_rectangle(20),
         widget             = wibox.widget.background,
     }
 
@@ -58,19 +58,19 @@ function calendar_widget(s)
                         format  = '%a %b %d, %T',
                         widget  = wibox.widget.textclock,
                     },
-                    left   = 10,
-                    right  = 10,
+                    left   = dpi(10),
+                    right  = dpi(10),
                     widget = wibox.container.margin
                 },
                 layout = wibox.layout.align.horizontal
             },
             bg                 = beautiful.button_normal,
-            shape_border_width = 1,
+            shape_border_width = dpi(1),
             shape_border_color = beautiful.nord4,
             shape              = gears.shape.rounded_bar,
             widget             = wibox.container.background
         },
-        margins = 4,
+        margins = dpi(4),
         widget  = wibox.container.margin
     }
 
@@ -78,7 +78,7 @@ function calendar_widget(s)
         if button == 1 then
             s.calendar.visible = not s.calendar.visible
 
-            center = mouse.current_widget_geometry.x - (s.calendar.width / 2 or 0) + (s.calendar_button.width / 2 or 0)
+            center = mouse.current_widget_geometry.x - ((s.calendar.width or 0) / 2) + ((s.calendar_button.width or 0) / 2)
             awful.placement.top_left(s.calendar, { margins = {top = 48, left = center }, parent = s })
         end
     end)

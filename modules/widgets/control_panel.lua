@@ -5,7 +5,7 @@ local control_panel_widget
 function control_panel_widget(s)
     --local xresources = require("beautiful.xresources")
     --local dpi        = xresources.apply_dpi
-    local width = 400
+    local width = dpi(400)
 
     -- Read the current pulse audio volume using the pamixer command
     function s.get_volume(f)
@@ -30,21 +30,21 @@ function control_panel_widget(s)
             widget = wibox.widget.textbox,
         },
         bg     = '#444444',
-        shape  = rounded_rectangle(20),
+        shape  = rounded_rectangle(dpi(20)),
         widget = wibox.container.background,
     }
 
     s.volume_slider = wibox.widget {
         bar_shape           = gears.shape.rounded_bar,
-        bar_height          = 4,
+        bar_height          = dpi(4),
         bar_color           = beautiful.nord8,
         handle_color        = beautiful.nord4,
         handle_shape        = gears.shape.circle,
         handle_border_color = beautiful.nord3,
-        handle_border_width = 2,
-        value               = 50,
-        minimum             = 0,
-        maximum             = 100,
+        handle_border_width = dpi(2),
+        value               = dpi(50),
+        minimum             = dpi(0),
+        maximum             = dpi(100),
         widget              = wibox.widget.slider,
     }
 
@@ -52,15 +52,15 @@ function control_panel_widget(s)
         --naughty.notify({text = tostring(v)})
         s.volume_slider = wibox.widget {
             bar_shape           = gears.shape.rounded_bar,
-            bar_height          = 4,
+            bar_height          = dpi(4),
             bar_color           = beautiful.nord8,
             handle_color        = beautiful.nord4,
             handle_shape        = gears.shape.circle,
             handle_border_color = beautiful.nord3,
-            handle_border_width = 2,
+            handle_border_width = dpi(2),
             value               = v,
-            minimum             = 0,
-            maximum             = 100,
+            minimum             = dpi(0),
+            maximum             = dpi(100),
             widget              = wibox.widget.slider,
         }
     end)
@@ -88,19 +88,19 @@ function control_panel_widget(s)
                     s.volume_slider,
                     layout = wibox.layout.align.horizontal,
                 },
-                left   = 15,
-                right  = 15,
+                left   = dpi(15),
+                right  = dpi(15),
                 widget = wibox.container.margin,
             },
             bg                 = beautiful.nord0,
             shape              = gears.shape.rounded_bar,
             shape_border_color = beautiful.nord4,
-            shape_border_width = 2,
+            shape_border_width = dpi(2),
             widget             = wibox.container.background,
         },
         strategy = 'exact',
-        width    = width - 20,
-        height   = 60,
+        width    = width - dpi(20),
+        height   = dpi(60),
         widget  = wibox.container.constraint
     }
 
@@ -185,16 +185,16 @@ function control_panel_widget(s)
                     text = '◀',
                     widget = wibox.widget.textbox,
                 },
-                top = 4, bottom = 4, left = 8, right = 8,
+                top = dpi(4), bottom = dpi(4), left = dpi(8), right = dpi(8),
                 widget = wibox.container.margin,
             },
             bg = beautiful.button_normal,
-            shape_border_width = 1,
+            shape_border_width = dpi(1),
             shape_border_color = '#d8dee9',
             shape = gears.shape.rounded_bar,
             widget = wibox.container.background,
         },
-        margins = 4,
+        margins = dpi(4),
         widget = wibox.container.margin,
     }
 

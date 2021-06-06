@@ -3,10 +3,10 @@ local rounded_rectangle = require("rounded_rectangle")
 -- Create a wibox with smooth rounded corners
 local rounded_wibox
 function rounded_wibox(arg)
-    local radius       = arg.radius       or 10
-    local width        = arg.width        or 200
-    local height       = arg.height       or 200
-    local border_width = arg.border_width or 1
+    local radius       = arg.radius       or dpi(10)
+    local width        = arg.width        or dpi(200)
+    local height       = arg.height       or dpi(200)
+    local border_width = arg.border_width or dpi(1)
     local bg_color     = arg.bg_color     or '#202020'
     local border_color = arg.border_color or '#FFFFFF'
     local visible      = arg.visible      or true
@@ -33,7 +33,7 @@ function rounded_wibox(arg)
 
     local widget = arg.widget or round_wibox_content
 
-    radius = radius + 2
+    radius = radius + dpi(2)
     round_wibox:setup {
         {
             widget,
@@ -65,9 +65,9 @@ return rounded_wibox
 -- local round_box = rounded_wibox ({
 --     widget   = rounded_wibox_content,
 --     bg_color = '#303030',
---     radius   = 20,
---     height   = 100,
+--     radius   = dpi(20),
+--     height   = dpi(100),
 -- })
 -- 
 -- -- Place it on screen
--- awful.placement.top(round_box, { margins = {top = 40}, parent = awful.screen.focused()})
+-- awful.placement.top(round_box, { margins = {top = dpi(40)}, parent = awful.screen.focused()})

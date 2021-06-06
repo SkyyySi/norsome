@@ -21,14 +21,14 @@ function taglist(s)
     s.taglist = awful.widget.taglist {
         screen  = s,
         filter  = awful.widget.taglist.filter.all,
-        buttons = taglist_buttons,
+        buttons = s.taglist_buttons,
 
         style  = {
             shape = gears.shape.rounded_bar,
         },
 
         layout = {
-            spacing = 4,
+            spacing = dpi(4),
             layout  = wibox.layout.fixed.horizontal
         },
 
@@ -88,7 +88,7 @@ function taglist(s)
                 shape_border_width = 1,
                 shape_border_color = beautiful.nord4,
             },
-            margins = 4,
+            margins = dpi(4),
             widget = wibox.container.margin,
         },
         layout = wibox.layout.fixed.horizontal,

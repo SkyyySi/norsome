@@ -69,7 +69,7 @@ theme.systray_icon_size    = dpi(15)
 
 -- Titlebars
 theme.titlebar_bg_normal = '#353C4A'
-theme.titlebar_size      = 28
+theme.titlebar_size      = dpi(28)
 
 -- There are other variable sets
 -- overriding the default one when

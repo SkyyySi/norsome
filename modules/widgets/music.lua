@@ -1,13 +1,6 @@
 local rounded_rectangle = require('rounded_rectangle')
 local buttonify         = require('buttonify')
 
-local notify
-function notify(...)
-	for v, i in ipairs(arg) do
-		naughty.notify({text = tostring(v)})
-	end
-end
-
 local music_button
 function music_button(s)
 	local get_song
@@ -45,23 +38,25 @@ function music_button(s)
 			--font   = 'Source Sans Pro Bold 12',
 			widget = wibox.widget.textbox,
 		},
-		left   = 6,
-		right  = 6,
+		left   = dpi(6),
+		right  = dpi(6),
 		widget = wibox.container.margin,
 	}
 
 	s.main = wibox.widget {
 		{{
-				s.content,
+				--s.content,
+				text   = '⏸ ',
+				widget = wibox.widget.textbox,
 				layout = wibox.layout.align.horizontal,
 			},
 			bg                 = beautiful.button_normal,
 			shape              = gears.shape.rounded_bar,
-			shape_border_width = 1,
+			shape_border_width = dpi(1),
 			shape_border_color = beautiful.nord4,
 			widget             = wibox.container.background,
 		},
-		margins = 4,
+		margins = dpi(4),
 		widget  = wibox.container.margin,
 		visible = true,
 	}
@@ -71,26 +66,26 @@ function music_button(s)
 		type    = 'desktop',
 		ontop   = true,
 		visible = false,
-		width   = 300,
-		height  = 150,
+		width   = dpi(300),
+		height  = dpi(150),
 		--shape   = rounded_rectangle(19)
 	}
 
 	s.coverart = wibox.widget {
 		{
-			forced_width  = 180,
-			forced_height = 180,
+			forced_width  = dpi(180),
+			forced_height = dpi(180),
 			resize        = true,
 			image         = beautiful.awesome_icon,
 			widget        = wibox.widget.imagebox,
 		},
-		shape  = rounded_rectangle(20),
+		shape  = rounded_rectangle(dpi(20)),
 		widget = wibox.container.margin,
 	}
 
-	awesome.connect_signal("bling::playerctl::title_artist_album", function(title, artist, art_path, player_name)
-		s.coverart.widget:set_image(gears.surface.load_uncached(art_path))
-	end)
+	--awesome.connect_signal("bling::playerctl::title_artist_album", function(title, artist, art_path, player_name)
+	--	s.coverart.widget:set_image(gears.surface.load_uncached(art_path))
+	--end)
 
 	get_cover(function(c)
 		local cover = c:gsub('\n', '')
@@ -115,13 +110,13 @@ function music_button(s)
 			widget = wibox.widget.textbox,
 		}
 
-		awesome.connect_signal('qrlinux::media::get_song_title', function(title)
-			song_info.title:set_text(tostring(title))
-		end)
+		--awesome.connect_signal('qrlinux::media::get_song_title', function(title)
+		--	song_info.title:set_text(tostring(title))
+		--end)
 
-		awesome.connect_signal('qrlinux::media::get_song_artist', function(artist)
-			song_info.artist:set_text(tostring(artist))
-		end)
+		--awesome.connect_signal('qrlinux::media::get_song_artist', function(artist)
+		--	song_info.artist:set_text(tostring(artist))
+		--end)
 
 		song_info.widget = wibox.widget {
 			{
@@ -139,15 +134,15 @@ function music_button(s)
 							layout = wibox.layout.flex.vertical,
 						},
 						strategy = 'exact',
-						width    = 180,
-						height   = 60,
+						width    = dpi(180),
+						height   = dpi(60),
 						widget   = wibox.container.constraint,
 					},
-					margins = 5,
+					margins = dpi(5),
 					widget  = wibox.container.margin,
 				},
 				bg     = '#404040',
-				shape  = rounded_rectangle(10),
+				shape  = rounded_rectangle(dpi(10)),
 				widget = wibox.container.background,
 			},
 			layout = wibox.layout.align.horizontal,
@@ -179,7 +174,7 @@ function music_button(s)
 	}
 
 	--buttonify(s.box)
-	awful.placement.top_right(s.box, { margins = {top = 48, right = 48}, parent = s})
+	awful.placement.top_right(s.box, { margins = {top = dpi(48), right = dpi(48)}, parent = s})
 
 	buttonify({widget = s.main.widget})
 
@@ -203,17 +198,20 @@ function music_button(s)
 		return(sym)
 	end
 
-	awful.widget.watch('true', 0.2, function()
-		get_song(function(song)
-			if song == '' then
-				s.main.visible = false -- Hide the widget if nothing is playing
-			else
-				s.main.visible = true
-				get_status(function(status) s.content.widget.text = print_status_sym(status, false) .. song end)
-				title = song
-			end
-		end)
-	end)
+	gears.timer {
+		autostart = true,
+		callback  = function()
+			get_song(function(song)
+				if song == '' then
+					s.main.visible = false -- Hide the widget if nothing is playing
+				else
+					s.main.visible = true
+					get_status(function(status) s.content.widget.text = print_status_sym(status, false) .. song end)
+					title = song
+				end
+			end)
+		end
+	}
 
 	get_song(function(song)
 		get_status(function(status)

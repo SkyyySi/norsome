@@ -92,14 +92,16 @@ function control_panel_widget(s)
                 right  = 15,
                 widget = wibox.container.margin,
             },
-            bg     = beautiful.nord0,
-            shape  = gears.shape.rounded_bar,
-            widget = wibox.container.background,
+            bg                 = beautiful.nord0,
+            shape              = gears.shape.rounded_bar,
+            shape_border_color = beautiful.nord4,
+            shape_border_width = 2,
+            widget             = wibox.container.background,
         },
         strategy = 'exact',
         width    = width - 20,
         height   = 60,
-        widget = wibox.container.constraint
+        widget  = wibox.container.constraint
     }
 
     local old_cursor, old_wibox

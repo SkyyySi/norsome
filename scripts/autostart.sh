@@ -4,19 +4,12 @@
 
 CONFIG_PREFIX="${XDG_CONFIG_DIR:-${HOME}/.config}/awesome/other"
 
-run_once=(
-#	"bash ${HOME}/.screenlayout/90_tripplescreen.sh"
-#	"bash ${HOME}/.config/start_jack.sh"
-#	'glava -d'
-#	'gnome-flashback'
-	'true'
-)
+# These cannot be checked with pgrep for some reason
+lxqt-policykit-agent&
+lxqt-powermanagement&
 
-# These processes get re-executed if they halt
 run=(
 	'blueman-applet'
-	'lxqt-policykit-agent'
-	'lxqt-powermanagement'
 	'lxqt-session -w awesome'
 #	'pasystray'
 	"picom --config ${CONFIG_PREFIX}/picom/picom.conf"
@@ -26,26 +19,30 @@ run=(
 	'xscreensaver -no-splash'
 )
 
+check_running() {
+	pgrep -U "${USER}" "^${1}" > /dev/null
+}
+
 run() {
-	local cmd_split
-	      cmd_split=$(printf '%s' "${*}")
+	#local cmd_split
+	#local cmd=( ${*} )
+	local cmd
+	read -a cmd <<<"${*}"
 	
-	if ! pgrep -f "${cmd_split[1]}"; then
-		#bash -c "nohup ${*} &> /dev/null"
+	if ! check_running "${cmd[0]}"; then
+		#awesome-client "naughty.notify({text = 'Spawning ${*}'})"
 		bash -c "${*}"
+	#else
+		#awesome-client "naughty.notify({text = 'NOT spawning ${*}'})"
 	fi
 }
 
 re_run() {
 	while true; do
-		run "${@}"
+		run "${*}"
 		sleep 1
 	done
 }
-
-for i in "${run_once[@]}"; do
-	run "${i}"&
-done
 
 for i in "${run[@]}"; do
 	re_run "${i}"&

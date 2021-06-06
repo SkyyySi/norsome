@@ -19,6 +19,12 @@ awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^' .. confdir .. 
 	end})
 end)
 
+awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^' .. confdir .. 'scripts/get_song_title.sh -f -g perc'}, function()
+	awful.spawn.with_line_callback(awful.util.getdir('config') .. 'scripts/get_song_title.sh -f -g perc', {stdout = function(percent)
+		awesome.emit_signal('qrlinux::media::get_song_prog_percent', tonumber(percent))
+	end})
+end)
+
 awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^playerctl status -F'}, function()
 	awful.spawn.with_line_callback('playerctl status -F', {stdout = function(s)
 		local status = false

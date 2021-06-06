@@ -100,65 +100,68 @@ function music_button(s)
 		}
 	end)
 
-	--s.song_info = wibox.widget {}
 	function s.song_info()
-		local song_info
-		get_song(function(title)
-			get_artist(function(artist)
-				song_info = wibox.widget {
-					{
-						orientation   = 'vertical',
-						forced_width  = 40,
-						forced_height = 40,
-						thickness     = 10,
-						color         = '#FF0000', --red
-						widget = wibox.widget.separator,
-					},
+		local song_info = {}
+
+		song_info.title = wibox.widget {
+			font   = 'Source Sans Pro Bold 18',
+			text   = 'No song',
+			widget = wibox.widget.textbox,
+		}
+
+		song_info.artist = wibox.widget {
+			font   = 'Source Sans Pro 12',
+			text   = 'is playing',
+			widget = wibox.widget.textbox,
+		}
+
+		awesome.connect_signal('qrlinux::media::get_song_title', function(title)
+			song_info.title:set_text(tostring(title))
+		end)
+
+		awesome.connect_signal('qrlinux::media::get_song_artist', function(artist)
+			song_info.artist:set_text(tostring(artist))
+		end)
+
+		song_info.widget = wibox.widget {
+			{
+				{
 					{
 						{
-							orientation   = 'horizontal',
-							forced_width  = 40,
-							forced_height = 40,
-							thickness     = 10,
-							color         = '#00FF00', --green
-							widget = wibox.widget.separator,
-						},
-						{{{{{
-											before,
-											font   = 'Source Sans Pro Bold 18',
-											text   = 'title',
-											widget = wibox.widget.textbox,
-										},
-										{
-											after,
-											font   = 'Source Sans Pro 12',
-											text   = 'artist',
-											widget = wibox.widget.textbox,
-										},
-										layout = wibox.layout.flex.vertical,
-									},
-									strategy = 'exact',
-									width    = 180,
-									height   = 60,
-									widget   = wibox.container.constraint,
-								},
-								margins = 5,
-								widget  = wibox.container.margin,
+							{
+								song_info.title,
+								layout = wibox.layout.align.horizontal,
 							},
-							bg     = '#404040',
-							shape  = rounded_rectangle(10),
-							widget = wibox.container.background,
+							{
+								song_info.artist,
+								layout = wibox.layout.align.horizontal,
+							},
+							layout = wibox.layout.flex.vertical,
 						},
-						layout = wibox.layout.align.horizontal,
+						strategy = 'exact',
+						width    = 180,
+						height   = 60,
+						widget   = wibox.container.constraint,
 					},
-					layout = wibox.layout.align.vertical,
-				}
-				naughty.notify({text = song_info})
-				return(song_info)
-			end)
-			return(song_info)
-		end)
-		return(song_info)
+					margins = 5,
+					widget  = wibox.container.margin,
+				},
+				bg     = '#404040',
+				shape  = rounded_rectangle(10),
+				widget = wibox.container.background,
+			},
+			layout = wibox.layout.align.horizontal,
+		}
+
+		song_info.aligned_widget = {
+			{
+				s.song_info(),
+				layout = wibox.layout.fixed.horizontal,
+			},
+			layout = wibox.layout.fixed.vertical,
+		}
+
+		return(song_info.widget)
 	end
 
 	--s.song_info.widget.widget.widget:set_bg('#000000')
@@ -168,11 +171,11 @@ function music_button(s)
 		{
 			{
 				s.song_info(),
-				layout = wibox.layout.align.horizontal,
+				layout = wibox.layout.fixed.horizontal,
 			},
-			layout = wibox.layout.align.vertical,
+			layout = wibox.layout.fixed.vertical,
 		},
-		layout = wibox.layout.stack
+		layout  = wibox.layout.flex.horizontal
 	}
 
 	--buttonify(s.box)

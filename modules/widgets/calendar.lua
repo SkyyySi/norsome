@@ -1,4 +1,5 @@
 local rounded_rectangle = require('rounded_rectangle')
+local infobubble        = require('infobubble')
 
 function calendar_widget(s)
     local s = s or awful.screen.focused()
@@ -6,9 +7,9 @@ function calendar_widget(s)
     s.calendar = wibox({
         ontop     = true,
         type      = 'dialog',
-        shape     = rounded_rectangle(20),
+        shape     = infobubble(20),--rounded_rectangle(20),
         placement = awful.placement.centered,
-        height    = 300,
+        height    = 240,
         width     = 190,
         visible   = false,
         screen    = s,
@@ -35,7 +36,8 @@ function calendar_widget(s)
                     s.calendar_box_content,
                     layout = wibox.layout.flex.horizontal
                 },
-                left = 10,
+                top    = 32,
+                left   = 10,
                 widget = wibox.container.margin
             },
             halign    = 'center',
@@ -46,7 +48,7 @@ function calendar_widget(s)
         },
         shape_border_width = 2,
         shape_border_color = beautiful.nord4,
-        shape              = rounded_rectangle(20),
+        shape              = infobubble(20), --rounded_rectangle(20),
         widget             = wibox.widget.background,
     }
 
@@ -75,10 +77,13 @@ function calendar_widget(s)
     s.calendar_button:connect_signal('button::release', function(c, _, _, button)
         if button == 1 then
             s.calendar.visible = not s.calendar.visible
+
+            center = mouse.current_widget_geometry.x - (s.calendar.width / 2 or 0) + (s.calendar_button.width / 2 or 0)
+            awful.placement.top_left(s.calendar, { margins = {top = 48, left = center }, parent = s })
         end
     end)
 
-    awful.placement.top_right(s.calendar, { margins = {top = 48, right = 16}})
+    --awful.placement.top_right(s.calendar, { margins = {top = 48, right = 16}})
     local old_cursor, old_wibox
     s.calendar_button.widget:connect_signal('mouse::enter', function(c)
         c:set_bg(beautiful.button_enter) -- hovered  / nord 2

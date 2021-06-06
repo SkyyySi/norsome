@@ -1,6 +1,6 @@
-local keyboard
-function keyboard()
-	local widget = wibox.widget {
+local kbdlayout
+function kbdlayout(s)
+	s.kbdlayout = wibox.widget {
 		{
 			{
 				{
@@ -19,7 +19,7 @@ function keyboard()
 		margins = 4,
 		widget  = wibox.container.margin,
 	}
-	return(widget)
+	return(s.kbdlayout)
 end
 
-return(keyboard)
+return(kbdlayout)

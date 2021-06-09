@@ -130,7 +130,7 @@ main() {
 		TITLE_tmp="$(rev <<<"${TITLE_tmp}")"
 		TITLE_tmp="$(sed 's|free download||gI' <<<"${TITLE_tmp}")"
 		TITLE_tmp="$(sed 's|()||g' <<<"${TITLE_tmp}")"
-		TITLE_tmp="$(sed 's|\[\]||g' <<<"${TITLE_tmp}")"
+		TITLE_tmp="$(sed 's|\[\]||g' <<<"${TITLE_tmp}" | sed 's| \- youtube||gI' | sed 's|(official.*video)||gI' | xargs)"
 		TITLE="${TITLE_tmp}"
 	fi
 

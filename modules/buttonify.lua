@@ -9,20 +9,12 @@ function buttonify(args)
 	local button_press   = args.button_press   or beautiful.button_press
 	local button_release = args.button_release or beautiful.button_release
 
-	-- IMPORTANT: The thing you want to be run must be a function, but you
-	-- must not pass it with () at the end!
-	local on_enter       = args.on_enter       or nil
-	local on_leav        = args.on_leav        or nil
-	local on_press       = args.on_press       or nil
-	local on_release     = args.on_release     or nil
-
 	local old_cursor, old_wibox
 	widget:connect_signal("mouse::enter", function(c)
 		c:set_bg(button_enter) -- hovered  / nord 2
 		local wb = mouse.current_wibox
 		old_cursor, old_wibox = wb.cursor, wb
 		wb.cursor = "hand1"
-		--on_enter()
 	end)
 	widget:connect_signal("mouse::leave", function(c)
 		c:set_bg(button_normal) -- default  / nord 1

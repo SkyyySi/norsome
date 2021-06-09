@@ -62,7 +62,7 @@ function menubutton(s)
 
 
     s.menubutton:connect_signal("button::press", function(c, _, _, button)
-        if button == 1 then
+        if (button == 1 or 2 or 3) then
             c:set_bg('#4c566a')
         end
     end)

@@ -18,20 +18,22 @@ hotkeys_popup = require('awful.hotkeys_popup')
 xresources    = require('beautiful.xresources')
 dpi           = xresources.apply_dpi
 xdg_menu      = require('archmenu')
+
+-- Add the local module and widget directory to awesome's path
+package.path = package.path .. ';' .. awful.util.getdir('config') .. '/modules/?.lua'
+
 require('awful.autofocus')
+require('base')
 
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
 require('awful.hotkeys_popup.keys')
 
--- Add the local module and widget directory to awesome's path
-package.path = package.path .. ';' .. awful.util.getdir('config') .. '/modules/?.lua'
-
 -- Autostart applications
 --awful.spawn(awful.util.getdir("config") .. '/scipts/autostart.sh')
 
 -- Error handling
-dofile(awful.util.getdir("config") .. "config/error-handler.lua")
+require('error-handler')
 
 -- {{{ Variable definitions
 theme       = 'nord'
@@ -42,10 +44,16 @@ editor      = 'code'
 editor_cmd  = editor
 config_dir  = awful.util.getdir('config')
 themes_dir  = config_dir .. 'themes/'
-theme_dir   = themes_dir .. theme
+theme_dir   = themes_dir .. theme .. '/'
 
 -- Themes define colours, icons, font and wallpapers.
-beautiful.init(theme_dir .. "/theme.lua")
+beautiful.init(theme_dir .. 'theme.lua')
+
+if ( terminal == 'alacritty' and filecheck.read(theme_dir .. 'alacritty.yml') ) then
+    local term_themed = 'alacritty -o "$(cat ' .. theme_dir .. 'alacritty.yml' .. ')"'
+    terminal = term_themed
+    naughty.notify({ text = terminal })
+end
 
 -- Load bling for extra stuff
 bling = require('bling')
@@ -394,6 +402,7 @@ awful.placement.bottom_right(testbox(awful.screen.focused()), { margin = { right
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 -- }}}
 
+--[[
 -- {{{ Dock
 local awedock
 function awedock(arg)
@@ -544,6 +553,7 @@ end
 --
 --awful.placement.bottom(dock, { margins = { bottom = 5 }, parent = awful.screen.focused()})
 -- }}}
+--]]
 
 
 --[[
@@ -690,7 +700,7 @@ awful.screen.connect_for_each_screen(function(s)
             layout = wibox.layout.fixed.horizontal,
         },
         {
-            --qrwidget.music(s),
+            qrwidget.music(s),
             qrwidget.volume(s),
             qrwidget.taglist(s),
             qrwidget.kbdlayout(s),

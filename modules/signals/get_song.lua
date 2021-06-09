@@ -27,8 +27,10 @@ end)
 
 awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^playerctl status -F'}, function()
 	awful.spawn.with_line_callback('playerctl status -F', {stdout = function(s)
-		local status = false
-		if s == 'Playing' then status = true end
+		local status = ''
+		if     s == 'Playing' then status = 'play'
+		elseif s == 'Paused'  then status = 'pause'
+		end
 		awesome.emit_signal('qrlinux::media::get_song_status', status)
 	end})
 end)

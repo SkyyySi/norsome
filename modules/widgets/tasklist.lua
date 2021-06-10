@@ -30,7 +30,7 @@ function tasklist(s)
     s.tasklist = awful.widget.tasklist {
         screen  = s,
         filter  = awful.widget.tasklist.filter.currenttags,
-        buttons = tasklist_buttons,
+        buttons = s.tasklist_buttons,
         style   = {
             shape              = gears.shape.rounded_bar,
             shape_border_width = 1,

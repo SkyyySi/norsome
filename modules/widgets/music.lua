@@ -67,8 +67,8 @@ function music_button(s)
 	buttonify({widget = s.music_button.widget})
 
 	-- Toggle the playing status when clicking on the button
-	s.music_button:connect_signal('button::release', function(c)
-		awful.spawn('playerctl play-pause')
+	s.music_button:connect_signal('button::release', function(_, _, _, button)
+		if button == 1 then awful.spawn('playerctl play-pause') end
 	end)
 
 	function s.print_status_sym(stat)
@@ -89,21 +89,27 @@ function music_button(s)
 		return(sym)
 	end
 
+	function s.set_song_title_icon(i) s.song_title_icon = i end
+	function s.set_song_title_text(t) s.song_title_text = t end
+
 	s.song_playing_status = ''
 	awesome.connect_signal('qrlinux::media::get_song_status', function(status)
-		s.song_playing_status = status
+		local i = s.print_status_sym(status)
+		s.set_song_title_icon(i)
 	end)
 
 	-- Update the text whenever a new song gets played
 	awesome.connect_signal('qrlinux::media::get_song_title', function(title)
-		local t
-		if (title and not (title == '')) then
-			t = (s.print_status_sym(s.song_playing_status) .. title)
-		else
-			t = 'No song'
-		end
-		s.music_button_text:set_text(tostring(t))
+		s.set_song_title_text(tostring(title))
 	end)
+
+	gears.timer {
+		autostart = true,
+		timeout   = 0.1,
+		callback  = function()
+			s.music_button_text:set_text(s.song_title_icon .. s.song_title_text)
+		end
+	}
 
 	--s.box = wibox {
 	--	bg      = '#202020E0',

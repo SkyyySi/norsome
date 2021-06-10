@@ -50,9 +50,8 @@ theme_dir   = themes_dir .. theme .. '/'
 beautiful.init(theme_dir .. 'theme.lua')
 
 if ( terminal == 'alacritty' and filecheck.read(theme_dir .. 'alacritty.yml') ) then
-    local term_themed = 'alacritty -o "$(cat ' .. theme_dir .. 'alacritty.yml' .. ')"'
-    terminal = term_themed
-    naughty.notify({ text = terminal })
+    local term_themed = 'sh -c "alacritty -o \\"$(/usr/bin/env cat ' .. theme_dir .. 'alacritty.yml' .. ')\\""'
+    terminal          = term_themed
 end
 
 -- Load bling for extra stuff
@@ -115,14 +114,13 @@ local menu_power = {
 }
 
 awesome_menu = awful.menu({ items = { { "Awesome", menu_awesome, beautiful.awesome_icon },
-                                       { "Power", menu_power },
+                                       { "Power", menu_power, beautiful.power_icon },
                                        { "Applications", xdgmenu },
                                        { "––––––––––––––––––––" },
                                        { "Terminal", terminal },
                                        { "Web browser", webbrowser },
                                        { "File manager", filemanager },
                                   } })
---
 
 --- EXTERNAL FILES ---
 local qrlinux  = {}

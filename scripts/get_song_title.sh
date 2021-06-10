@@ -126,25 +126,31 @@ main() {
 		TITLE_tmp="$(sed 's/-[^-]*//2g' <<<"${FULL_TITLE}")"
 		TITLE_tmp="$(sed 's|^\[.*\] ||' <<<"${TITLE_tmp}" | sed 's|^ ||' | sed 's|^- ||')"
 		TITLE_tmp="$(rev <<<"${TITLE_tmp}")"
-		TITLE_tmp="$(sed 's|^\].*\[ ||' <<<"${TITLE_tmp}")"
+		#TITLE_tmp="$(sed 's|^\].*\[||' <<<"${TITLE_tmp}")"
+		TITLE_tmp="${TITLE_tmp/^\].*\[/}"
 		TITLE_tmp="$(rev <<<"${TITLE_tmp}")"
-		TITLE_tmp="$(sed 's|free download||gI' <<<"${TITLE_tmp}")"
-		TITLE_tmp="$(sed 's|()||g' <<<"${TITLE_tmp}")"
-		TITLE_tmp="$(sed 's|\[\]||g' <<<"${TITLE_tmp}" | sed 's| \- youtube||gI' | sed 's|(official.*video)||gI' | xargs)"
+		TITLE_tmp="$(sed 's|free.*download||gI' <<<"${TITLE_tmp}")"
+		TITLE_tmp="$(sed 's|\[\]||g' <<<"${TITLE_tmp}"| sed 's| \- youtube||gI'  | sed 's|official.*video||gI')"
+		TITLE_tmp="${TITLE_tmp/\[\]/}"
+		TITLE_tmp="${TITLE_tmp/\(\)/}"
 		TITLE="${TITLE_tmp}"
 	fi
 
 	TITLE="${TITLE:-FULL_TITLE}"
 
 	if [[ -n "${TITLE_ONLY}" ]]; then
-		TITLE_NO_ARTIST="$(sed "s|$(grep -o '^.* - ' <<<"${TITLE}")||" <<<"${TITLE}")"
+		local TITLE_NO_ARTIST
+		TITLE_NO_ARTIST="$(grep -o '^.* - ' <<<"${TITLE}")"
+		TITLE_NO_ARTIST="${TITLE/${TITLE_NO_ARTIST}/}"
+		TITLE_NO_ARTIST="$(xargs <<<"${TITLE_NO_ARTIST}")"
+		#TITLE_NO_ARTIST="$(sed "s|$(grep -o '^.* - ' <<<${TITLE})||" <<<"${TITLE}")"
 		echo -e "${TITLE_NO_ARTIST}"
 	elif [[ -n "${ARTIST_ONLY}" ]]; then
 		ARTIST="$(echo "${TITLE}" | grep --color -oP '.* - ' | rev | sed 's| - ||' | rev)"
 		echo -e "${ARTIST}"
 	else
 		echo -e "${TITLE}"
-fi
+	fi
 }
 
 if [[ -n "${FOLLOW}" ]]; then

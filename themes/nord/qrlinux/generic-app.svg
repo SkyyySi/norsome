@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="200"
+   height="200"
+   viewBox="0 0 200 200"
+   version="1.1"
+   id="svg9"
+   sodipodi:docname="generic-app.svg"
+   inkscape:version="1.1 (c4e8f9ed74, 2021-05-24)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs13" />
+  <sodipodi:namedview
+     id="namedview11"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="125.51145"
+     inkscape:cy="110.48543"
+     inkscape:window-width="1916"
+     inkscape:window-height="1036"
+     inkscape:window-x="1920"
+     inkscape:window-y="40"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg9" />
+  <!-- Uploaded to SVGRepo https://www.svgrepo.com -->
+  <title
+     id="title2">ic_fluent_app_generic_24_regular</title>
+  <desc
+     id="desc4">Created with Sketch.</desc>
+  <g
+     id="🔍-Product-Icons"
+     stroke="none"
+     stroke-width="1"
+     fill="none"
+     fill-rule="evenodd"
+     transform="matrix(5.5551852,0,0,5.5555556,33.334444,33.333333)"
+     style="opacity:1;fill:#d8dee9;fill-opacity:0.969612">
+    <g
+       id="ic_fluent_app_generic_24_regular"
+       fill="#212121"
+       fill-rule="nonzero"
+       style="fill:#d8dee9;fill-opacity:0.969612">
+      <path
+         d="m 17.7512,3 0.18442,0.00514 c 1.64809,0.092195 2.968241,1.4123559 3.060435,3.0604362 L 21.0012,6.25 v 11.5 l -0.0051,0.1844 C 20.90045,19.6435 19.48423,21 17.7512,21 H 6.25 C 4.51697,21 3.10075,19.6435 3.00514,17.9344 L 3,17.75 V 6.25 C 3,4.51697 4.35645,3.10075 6.06558,3.00514 L 6.25,3 Z M 19.5,8 H 4.5012 L 4.5,17.75 c 0,0.9182 0.70711,1.6712 1.60647,1.7442 L 6.25,19.5 h 11.5012 l 0.14353,-0.0058 c 0.849396,-0.06894 1.527309,-0.744432 1.600011,-1.592785 L 19.5012,17.75 Z m -9.25,1.5 c 0.379696,0 0.693491,0.2821539 0.743153,0.648229 L 11,10.25 v 7 c 0,0.379696 -0.282154,0.693491 -0.648229,0.743153 L 10.25,18 H 6.75 C 6.3703042,18 6.056509,17.717846 6.0068466,17.351771 L 6,17.25 v -7 C 6,9.8703042 6.2821539,9.556509 6.6482294,9.5068466 L 6.75,9.5 Z M 9.5,11 h -2 v 5.5 h 2 z m 6.75,1.502996 c 0.414214,0 0.75,0.335786 0.75,0.75 0,0.379696 -0.282154,0.693491 -0.648229,0.743153 L 16.25,14.002996 h -3.495588 c -0.414213,0 -0.75,-0.335787 -0.75,-0.75 0,-0.379696 0.282154,-0.693491 0.64823,-0.743153 l 0.10177,-0.0068 z M 17.25,9.5 c 0.414214,0 0.75,0.3357864 0.75,0.75 0,0.379696 -0.282154,0.693491 -0.648229,0.743153 L 17.25,11 h -4.495588 c -0.414213,0 -0.75,-0.335786 -0.75,-0.75 0,-0.3796958 0.282154,-0.693491 0.64823,-0.7431534 L 12.754412,9.5 Z"
+         id="🎨-Color"
+         style="fill:#d8dee9;fill-opacity:0.969612" />
+    </g>
+  </g>
+  <metadata
+     id="metadata15">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>ic_fluent_app_generic_24_regular</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

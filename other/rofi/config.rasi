@@ -5,9 +5,10 @@
 
 configuration {
 /*	theme:                     "Nordic"; */
-	location:                    1;
+	fullscreen:                  false;
+	location:                    0;
 	xoffset:                     0;
-	yoffset:                     40;
+	yoffset:                     0;
 	modi:                        "drun,window,ssh,run";
 	font:                        "Source Sans Pro Semibold 16";
 	combi-modi:                  "window,drun,ssh";
@@ -16,7 +17,7 @@ configuration {
 	display-ssh:                 "SSH";
 	display-run:                 "Commands";
 	show-icons:                  true;
-	sidebar-mode:                true;
+	sidebar-mode:                false;
 }
 
 * {
@@ -28,8 +29,8 @@ configuration {
 	alternate-normal-background: #434c5e;
 	alternate-active-background: #434c5e;
 	alternate-urgent-background: #bf616a;
-	selected-normal-background:  #81a1c1;
-	selected-active-background:  #81a1c1;
+	selected-normal-background:  #5e81ac;
+	selected-active-background:  #5e81ac;
 	selected-urgent-background:  #ebcb8b;
 
 	foreground:                  #d8dee9;
@@ -55,7 +56,7 @@ configuration {
     padding:                     5;
 	border-radius:               0;
 	border:                      2;
-	border-color:                #81a1c1;
+	border-color:                #d8dee9;
 }
 #mainbox {
     border:  0;
@@ -71,11 +72,12 @@ configuration {
 }
 #listview {
     fixed-height: 0;
-	border-radius:               0;
 }
 #element {
-    border:  0;
-    padding: 1px ;
+    padding:       0 10 0 10;
+    border:        1;
+    border-color:#4c566a;
+	border-radius: 999;
 }
 #element.normal.normal {
     background-color: @normal-background;
@@ -121,9 +123,9 @@ configuration {
 	spacing:    0;
 	padding:    0;
 	text-color: @normal-foreground;
-	border-radius:               5;
-	border:                      2;
-	border-color:                #81a1c1;
+	border-radius:               999;
+	border:                      1;
+	border-color:                #d8dee9;
 }
 #button.selected {
     background-color: @selected-normal-background;

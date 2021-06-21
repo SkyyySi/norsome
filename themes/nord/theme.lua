@@ -52,6 +52,9 @@ theme.button_normal  = theme.nord1        -- default
 theme.button_enter   = theme.nord2        -- hovered
 theme.button_press   = theme.nord3        -- pressed
 theme.button_release = theme.button_enter -- released
+theme.button_border_shape = gears.shape.rounded_bar
+theme.button_border_color = theme.nord4 or '#FFFFFF'
+theme.button_border_width = dpi(1)
 
 theme.menubutton_normal  = '#00000000'             -- default
 theme.menubutton_enter   = theme.button_enter      -- hovered
@@ -59,7 +62,7 @@ theme.menubutton_press   = theme.button_press      -- pressed
 theme.menubutton_release = theme.button_enter      -- released
 theme.menubutton_leave   = theme.menubutton_normal -- released
 
-theme.bg_systray     = theme.button_normal or theme.nord1
+theme.bg_systray = theme.button_normal or theme.nord1
 
 theme.taglist_bg_empty     = theme.nord1
 theme.taglist_bg_occupied  = theme.nord2
@@ -73,7 +76,7 @@ theme.systray_icon_spacing = dpi(10)
 theme.systray_icon_size    = dpi(15)
 
 -- Titlebars
-theme.titlebar_bg_normal = '#353C4A'
+theme.titlebar_bg_normal = theme.nord1 or '#353C4A'
 theme.titlebar_size      = dpi(28)
 
 -- There are other variable sets
@@ -169,15 +172,22 @@ theme.layout_cornerse   = theme_dir .. 'layouts/cornersew.png'
     theme.menu_height, theme.bg_focus, theme.fg_focus
 )]]--
 
+theme.icon = {}
+
 --- ICONS ---
 --theme.awesome_icon = theme_dir .. 'qrlinux/QRLinux-logo.svg' -- main logo
-theme.awesome_icon = theme_dir .. 'qrlinux/QRLinux-logo-nobg.svg' -- main logo
-theme.power_icon   = theme_dir .. 'qrlinux/power-button.svg' -- power (off) button
+theme.awesome_icon  = theme_dir .. 'qrlinux/QRLinux-logo-nobg.svg' -- main logo
+theme.icon.power    = theme_dir .. 'qrlinux/power-button.svg' -- power (off) button
+theme.icon.app      = theme_dir .. 'qrlinux/generic-app.svg' -- symbol of a generic app
+theme.icon.terminal = theme_dir .. 'qrlinux/terminal.svg'
+theme.icon.folder   = theme_dir .. 'qrlinux/folder.svg'
+theme.icon.web      = theme_dir .. 'qrlinux/web.svg'
+theme.icon.note     = theme_dir .. 'qrlinux/musical-note.svg'
 
 -- Define the icon theme for application icons. If not set then the icons
 -- from /usr/share/icons and /usr/share/icons/hicolor will be used.
 theme.icon_theme = nil
 
-return theme
+return(theme)
 
 -- vim: filetype=lua:expandtab:shiftwidth=4:tabstop=8:softtabstop=4:textwidth=80

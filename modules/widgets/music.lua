@@ -1,8 +1,12 @@
 local rounded_rectangle = require('rounded_rectangle')
+local infobubble        = require('infobubble')
 local buttonify         = require('buttonify')
 
 local music_button
 function music_button(s)
+    s.arrow_width = dpi(10)
+	s.shape_size = dpi(20)
+    s.shape = infobubble(s.shape_size, s.arrow_width)
 	--return(nil)
 	--local get_song
     --function get_song(f)
@@ -66,23 +70,13 @@ function music_button(s)
 	-- Hover effects
 	buttonify({widget = s.music_button.widget})
 
-	-- Toggle the playing status when clicking on the button
-	s.music_button:connect_signal('button::release', function(_, _, _, button)
-		if button == 1 then awful.spawn('playerctl play-pause') end
-	end)
-
 	function s.print_status_sym(stat)
 		local sym
-		local playing = '♫ ⏸ '
-		local paused  = '♫ ⏵ '
+		local playing = '⏸'
+		local paused  = '⏵'
 
-		--if     stat == 'Playing\n' then sym = playing
-		--elseif stat == 'Paused\n'  then sym = paused
-		--else sym = ''
-		--end
-
-		if     stat == 'play'  then sym = playing
-		elseif stat == 'pause' then sym = paused
+		if     stat == true  then sym = playing
+		elseif stat == false then sym = paused
 		else sym = ''
 		end
 
@@ -92,11 +86,275 @@ function music_button(s)
 	function s.set_song_title_icon(i) s.song_title_icon = i end
 	function s.set_song_title_text(t) s.song_title_text = t end
 
+	s.box = wibox {
+		screen  = s,
+		bg      = beautiful.nord0 .. '80' or '#2E344080',
+		type    = 'dialog',
+		ontop   = true,
+		visible = false,
+		width   = dpi(300),
+		height  = dpi(180),
+		shape   = s.shape
+	}
+
+	s.box_content_text_title = wibox.widget {
+		align  = 'left',
+		font   = 'Source Code Sans Bold 14',
+		text   = 'No song',
+		widget = wibox.widget.textbox,
+	}
+
+	awesome.connect_signal('qrlinux::media::get_song_title', function(t)
+		s.box_content_text_title:set_text(t)
+	end)
+
+	function s.box_content_makebutton(w, a)
+		local button = wibox.widget {
+			{
+				{
+					w,
+					layout = wibox.layout.fixed.horizontal
+				},
+				margins = dpi(6),
+				widget = wibox.container.margin,
+			},
+			bg                 = beautiful.nord1 or '#00000000',
+			shape              = gears.shape.circle,
+			shape_border_width = dpi(1),
+			shape_border_color = (beautiful.nord4 or '#D8DEE9'),
+			widget             = wibox.container.background
+		}
+
+		buttonify({widget = button})
+		button:connect_signal('button::release', function()
+			local action = load(a)
+			action()
+		end)
+
+		return(button)
+	end
+
+	s.box_content_button_playpause_text = wibox.widget {
+		font   = 'Source Code Pro Bold 18',
+		text   = '⏸',
+		widget = wibox.widget.textbox,
+	}
+	s.box_content_button_playpause = s.box_content_makebutton(s.box_content_button_playpause_text, "awful.spawn('playerctl play-pause')")
+
+	s.box_content_button_prev_text = wibox.widget {
+		font   = 'Source Code Pro Bold 14',
+		text   = '⏪',
+		widget = wibox.widget.textbox,
+	}
+	s.box_content_button_prev = s.box_content_makebutton(s.box_content_button_prev_text, "awful.spawn('playerctl previous')")
+
+	s.box_content_button_next_text = wibox.widget {
+		font   = 'Source Code Pro Bold 14',
+		text   = '⏩',
+		widget = wibox.widget.textbox,
+	}
+	s.box_content_button_next = s.box_content_makebutton(s.box_content_button_next_text, "awful.spawn('playerctl next')")
+
+	s.box_content_text_artist = wibox.widget {
+		align  = 'right',
+		text   = 'No artist',
+		widget = wibox.widget.textbox,
+	}
+
+	s.content_progessbar = wibox.widget {
+		min_value        = 0,
+		max_value        = 100,
+		value            = 50,
+		background_color = (beautiful.nord1 .. '80') or '#3B425280',
+		color            = beautiful.nord9 or '#81A1C1',
+		border_width     = dpi(1),
+		border_color     = beautiful.nord4,
+		shape            = gears.shape.rounded_bar,
+		bar_shape        = gears.shape.rounded_bar,
+		widget           = wibox.widget.progressbar
+	}
+
+	gears.timer {
+		autostart = true,
+		timeout   = 0.1,
+		callback  = function()
+			awful.spawn.easy_async({'playerctl', 'metadata', 'mpris:length'}, function(value)
+				local v
+				v = string.gsub(value, '\n', '')
+				v = tonumber(value)
+				s.content_progessbar:set_max_value(v or 100)
+			end)
+			awful.spawn.easy_async_with_shell('playerctl metadata --format "{{ position }}"', function(value)
+				local v
+				v = string.gsub(value, '\n', '')
+				v = tonumber(value)
+				s.content_progessbar:set_value(v or 0)
+			end)
+		end
+	}
+
+	s.content_progessbar_container = wibox.widget {
+		{
+			s.content_progessbar,
+			layout = wibox.layout.fixed.horizontal
+		},
+		margins = dpi(8),
+		widget  = wibox.container.margin
+	}
+
+	s.box_content_coverart = wibox.widget {
+		{
+			resize = true,
+			image  = (beautiful.icon.note or beautiful.awesome_icon),
+			widget = wibox.widget.imagebox,
+		},
+		shape  = rounded_rectangle(dpi(20)),
+		widget = wibox.container.background,
+	}
+
+	s.cover_art_path = ''
+	function s.set_cover_art_path(path)
+		s.cover_art_path = tostring(path)
+	end
+
+	s.cover_art_checksum = ''
+	function s.set_cover_art_checksum(checksum)
+		s.cover_art_checksum = tostring(checksum)
+	end
+
+	--awesome.connect_signal('qrlinux::media::get_song_cover', function(i)
+	awesome.connect_signal('bling::playerctl::title_artist_album', function(_, _, i, _)
+		local time = os.time(os.date("!*t")) -- This has to be done because the file path will always be the same
+		local filename = ('/tmp/awesome_media_cover_' .. os.getenv('USER') .. time .. '.jpg')
+		if not s.cover_art_path == filename then
+			awful.spawn({'rm', '-f', s.cover_art_path})
+		end
+
+		s.box_content_coverart.widget:set_image(beautiful.icon.note or beautiful.awesome_icon)
+		awful.spawn.easy_async_with_shell('ffmpeg -i ' .. i .. ' ' .. filename .. ' > /dev/null; echo now', function()
+			local p = filename
+			s.set_cover_art_path(p)
+			s.box_content_coverart.widget:set_image(p)
+		end)
+	end)
+
+	gears.timer {
+		autostart = true,
+		timeout   = 1,
+		callback  = function()
+			s.box_content_coverart.widget:set_image(s.cover_art_path)
+		end
+	}
+
+	awesome.connect_signal('qrlinux::media::get_song_artist', function(a)
+		if (not a) or a == '' then a = 'No artist' end
+		s.box_content_text_artist:set_text(a)
+	end)
+
+	s.box_content_container = wibox.widget {
+		{
+			{
+				{
+					{
+						{
+							{
+								{
+									{
+										s.box_content_coverart,
+										layout = wibox.layout.fixed.horizontal,
+									},
+									bg                 = '#00000040',
+									shape              = function(cr) gears.shape.rounded_rect(cr, dpi(82), dpi(82), (s.shape_size / 4)) end,
+									shape_clip         = true,
+									shape_border_width = dpi(1),
+									shape_border_color = (beautiful.nord3 or '#4C566A'),
+									widget             = wibox.container.background,
+								},
+								strategy = 'exact',
+								width    = dpi(82),
+								widget   = wibox.container.constraint,
+							},
+							margins = dpi(8),
+							widget  = wibox.container.margin,
+						},
+						{
+							wibox.widget {
+								s.box_content_text_title,
+								layout        = wibox.container.scroll.horizontal,
+								step_function = wibox.container.scroll.step_functions.linear_increase,
+								speed         = 25,
+								max_size      = dpi(150),
+							},
+							wibox.widget {
+								s.box_content_text_artist,
+								layout        = wibox.container.scroll.horizontal,
+								step_function = wibox.container.scroll.step_functions.linear_increase,
+								speed         = 25,
+								max_size      = dpi(150),
+							},
+							{
+								s.box_content_button_prev,
+								s.box_content_button_playpause,
+								s.box_content_button_next,
+								spacing = dpi(18),
+								layout  = wibox.layout.fixed.horizontal,
+							},
+							layout = wibox.layout.fixed.vertical,
+						},
+						layout = wibox.layout.fixed.horizontal,
+					},
+					s.content_progessbar_container,
+					layout = wibox.layout.align.vertical
+				},
+				--margins = dpi(4),
+				widget  = wibox.container.margin,
+			},
+			bg                 = '#00000040',
+			shape              = rounded_rectangle(s.shape_size / 2),
+			shape_border_width = dpi(1),
+			shape_border_color = (beautiful.nord4 or '#D8DEE9'),
+			widget             = wibox.container.background,
+		},
+		top    = (s.shape_size + s.arrow_width),
+		bottom = s.shape_size, right = s.shape_size, left = s.shape_size,
+		widget = wibox.container.margin,
+	}
+
+	s.box:setup {
+		{
+			s.box_content_container,
+			layout = wibox.layout.flex.horizontal,
+		},
+		shape              = s.shape,
+		shape_border_width = dpi(2),
+		shape_border_color = (beautiful.nord4 or '#D8DEE9'),
+		widget             = wibox.container.background,
+	}
+
+	-- Toggle the playing status when clicking on the button
+	s.music_button:connect_signal('button::release', function(_, _, _, button)
+		if button == 1 then
+			awful.spawn('playerctl play-pause')
+		elseif button == 3 then
+			s.box.visible = not s.box.visible
+			center = mouse.current_widget_geometry.x - ((s.box.width / 2) or 0)
+			awful.placement.top_left(s.box, { margins = {top = dpi(48), left = center }, parent = s })
+		end
+	end)
+
 	s.song_playing_status = ''
 	awesome.connect_signal('qrlinux::media::get_song_status', function(status)
+		--if not status or status == '' then status = '⏸' end
 		local i = s.print_status_sym(status)
-		s.set_song_title_icon(i)
+		if not i or i == '' then
+			s.music_button.visible = false
+		else
+			s.music_button.visible = true
+			s.set_song_title_icon('♫ ' .. i .. ' ')
+			s.box_content_button_playpause_text:set_text(i)
+		end
 	end)
+	awesome.emit_signal('qrlinux::media::get_song_status', '')
 
 	-- Update the text whenever a new song gets played
 	awesome.connect_signal('qrlinux::media::get_song_title', function(title)
@@ -110,16 +368,6 @@ function music_button(s)
 			s.music_button_text:set_text(s.song_title_icon .. s.song_title_text)
 		end
 	}
-
-	--s.box = wibox {
-	--	bg      = '#202020E0',
-	--	type    = 'desktop',
-	--	ontop   = true,
-	--	visible = false,
-	--	width   = dpi(300),
-	--	height  = dpi(150),
-	--	--shape   = rounded_rectangle(19)
-	--}
 
 	--s.coverart = wibox.widget {
 	--	{

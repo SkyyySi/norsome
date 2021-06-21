@@ -6,9 +6,9 @@
    id="Capa_1"
    x="0px"
    y="0px"
-   width="187.26801"
-   height="198.79401"
-   viewBox="0 0 187.268 198.794"
+   width="200"
+   height="200"
+   viewBox="0 0 199.99999 199.99999"
    xml:space="preserve"
    sodipodi:docname="power-button.svg"
    inkscape:version="1.1 (c4e8f9ed74, 2021-05-24)"
@@ -30,30 +30,31 @@
    fit-margin-right="0"
    fit-margin-bottom="0"
    inkscape:zoom="3.1080905"
-   inkscape:cx="95.557063"
-   inkscape:cy="93.787488"
+   inkscape:cx="104.56581"
+   inkscape:cy="97.004897"
    inkscape:window-width="1916"
    inkscape:window-height="1036"
    inkscape:window-x="1920"
    inkscape:window-y="40"
    inkscape:window-maximized="1"
    inkscape:current-layer="Capa_1"
-   width="187.26801px" />
+   width="187.26801px"
+   showguides="false" />
 <g
    id="g8"
-   transform="translate(44.435,50.1985)"
-   style="opacity:1;fill:#d8dee9;fill-opacity:1;stroke:none;stroke-opacity:1">
+   transform="matrix(1.0255414,0,0,1.0162911,49.54439,50)"
+   style="opacity:1;fill:#d8dee9;fill-opacity:1;stroke:#d8dee9;stroke-opacity:1;stroke-width:2.93856699;stroke-miterlimit:4;stroke-dasharray:none">
 	<g
    id="g6"
-   style="fill:#d8dee9;fill-opacity:1;stroke:none;stroke-opacity:1">
+   style="fill:#d8dee9;fill-opacity:1;stroke:#d8dee9;stroke-opacity:1;stroke-width:2.93856699;stroke-miterlimit:4;stroke-dasharray:none">
 		<path
    d="m 66.573,9.146 c -0.721,-0.292 -1.478,-0.44 -2.25,-0.44 -2.457,0 -4.641,1.471 -5.562,3.749 -1.242,3.066 0.242,6.572 3.309,7.813 13.028,5.276 21.446,17.764 21.446,31.812 0,18.923 -15.396,34.317 -34.317,34.317 -18.922,0 -34.317,-15.395 -34.317,-34.317 0,-14.044 8.418,-26.529 21.446,-31.805 1.485,-0.602 2.647,-1.746 3.272,-3.221 0.625,-1.476 0.638,-3.106 0.036,-4.592 -0.922,-2.277 -3.105,-3.749 -5.563,-3.749 -0.772,0 -1.529,0.148 -2.25,0.44 -17.581,7.12 -28.941,23.97 -28.941,42.927 0,25.539 20.777,46.317 46.317,46.317 25.541,0 46.317,-20.778 46.317,-46.317 C 95.515,33.118 84.155,16.265 66.573,9.146 Z"
    id="path2"
-   style="fill:#d8dee9;fill-opacity:1;stroke:none;stroke-opacity:1" />
+   style="fill:#d8dee9;fill-opacity:1;stroke:#d8dee9;stroke-opacity:1;stroke-width:2.93856699;stroke-miterlimit:4;stroke-dasharray:none" />
 		<path
    d="m 49.198,42.698 c 2.761,0 5,-2.239 5,-5 V 5 c 0,-2.761 -2.238,-5 -5,-5 -2.762,0 -5,2.239 -5,5 v 32.698 c 0,2.761 2.239,5 5,5 z"
    id="path4"
-   style="fill:#d8dee9;fill-opacity:1;stroke:none;stroke-opacity:1" />
+   style="fill:#d8dee9;fill-opacity:1;stroke:#d8dee9;stroke-opacity:1;stroke-width:2.93856699;stroke-miterlimit:4;stroke-dasharray:none" />
 	</g>
 </g>
 <g

@@ -13,6 +13,7 @@ run=(
 	'lxqt-session -w awesome'
 #	'pasystray'
 	"picom --config ${CONFIG_PREFIX}/picom/picom.conf"
+	'playerctld daemon'
 #	'timidity -iA'
 #	'ulauncher'
 	'unclutter -b'
@@ -47,3 +48,7 @@ re_run() {
 for i in "${run[@]}"; do
 	re_run "${i}"&
 done
+
+if ! pgrep 'plasma-browser.*' > /dev/null; then
+	plasma-browser-integration-host
+fi

@@ -98,7 +98,17 @@ globalkeys = gears.table.join(
               {description = "lua execute prompt", group = "awesome"}),
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end,
-              {description = "show the menubar", group = "launcher"})
+              {description = "show the menubar", group = "launcher"}),
+    awful.key({ modkey, "Shift" }, "p", function() awful.spawn('qdbus org.kde.krunner /App display') end,
+              {description = "show krunner", group = "launcher"}),
+
+    -- Control media
+    awful.key({ }, 'XF86AudioPlay',        function() awful.spawn({'playerctl', 'play-pause'}) end),
+    awful.key({ }, 'XF86AudioPrev',        function() awful.spawn({'playerctl', 'previous'  }) end),
+    awful.key({ }, 'XF86AudioNext',        function() awful.spawn({'playerctl', 'next'      }) end),
+    awful.key({ }, 'XF86AudioRaiseVolume', function() awful.spawn({'pamixer', '-i', '5'     }) end),
+    awful.key({ }, 'XF86AudioLowerVolume', function() awful.spawn({'pamixer', '-d', '5'     }) end),
+    awful.key({ }, 'XF86AudioMute',        function() awful.spawn({'pamixer', '-t'          }) end)
 )
 
 return(globalkeys)

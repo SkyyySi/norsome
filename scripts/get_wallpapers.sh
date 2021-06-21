@@ -16,10 +16,11 @@ WALLPAPER_DIRS=(
 
 list_images() {
 	[[ -d "${1}" && -n $(command ls "${1}/") ]] || return 1
-	
-	for i in $(echo "${1}"/**/*.{png,bmp,jpg,jpeg,gif,tiff}); do
-		[[ -f "${i}" ]] && echo "${i}"
-	done
+
+	local list
+	list=( $(echo "${1}/"*.{png,bmp,jpg,jpeg,gif,tiff}) $(echo "${1}/"**/*.{png,bmp,jpg,jpeg,gif,tiff}) )
+
+	printf '%s\n' "${list[@]}"
 }
 
 for i in "${!WALLPAPER_DIRS[@]}"; do

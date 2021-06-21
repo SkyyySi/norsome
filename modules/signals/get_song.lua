@@ -1,39 +1,41 @@
-local username = os.getenv('USER')
-local confdir  = awful.util.getdir('config')
+local username  = os.getenv('USER')
+local confdir   = awful.util.getdir('config')
+local lgi       = require('lgi')
 
-awful.spawn.easy_async('pkill --full --uid' .. username .. " '^" .. confdir .. "scripts/get_song_title.sh -t -f'", function()
-	awful.spawn.with_line_callback(awful.util.getdir('config') .. 'scripts/get_song_title.sh -t -f', {stdout = function(title)
+awful.spawn.easy_async({'pkill', '--full', '--uid', username, (confdir..'scripts/get_song_title.sh -t -f')}, function()
+--awful.spawn.easy_async_with_shell('pkill --full --uid' .. username .. " '^" .. confdir .. "scripts/get_song_title.sh -t -f'", function()
+	awful.spawn.with_line_callback((confdir..'scripts/get_song_title.sh -t -f'), {stdout = function(title)
 		awesome.emit_signal('qrlinux::media::get_song_title', title)
 	end})
 end)
 
---awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^' .. confdir .. 'scripts/get_song_title.sh -a -f'}, function()
-awful.spawn.easy_async('pkill --full --uid' .. username .. " '^" .. confdir .. "scripts/get_song_title.sh -a -f'", function()
-	awful.spawn.with_line_callback(awful.util.getdir('config') .. 'scripts/get_song_title.sh -a -f', {stdout = function(artist)
+awful.spawn.easy_async({'pkill', '--full', '--uid', username, (confdir..'scripts/get_song_title.sh -a -f')}, function()
+--awful.spawn.easy_async_with_shell('pkill --full --uid' .. username .. " '^" .. confdir .. "scripts/get_song_title.sh -a -f'", function()
+	awful.spawn.with_line_callback((confdir..'scripts/get_song_title.sh -a -f'), {stdout = function(artist)
 		awesome.emit_signal('qrlinux::media::get_song_artist', artist)
 	end})
 end)
 
---awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^' .. confdir .. 'scripts/get_song_title.sh -c -f'}, function()
-awful.spawn.easy_async('pkill --full --uid' .. username .. " '^" .. confdir .. "scripts/get_song_title.sh -c -f'", function()
-	awful.spawn.with_line_callback(awful.util.getdir('config') .. 'scripts/get_song_title.sh -c -f', {stdout = function(cover)
+awful.spawn.easy_async({'pkill', '--full', '--uid', username, (confdir..'scripts/get_song_title.sh -c -f')}, function()
+--awful.spawn.easy_async_with_shell('pkill --full --uid' .. username .. " '^" .. confdir .. "scripts/get_song_title.sh -c -f'", function()
+	awful.spawn.with_line_callback((confdir..'scripts/get_song_title.sh -c -f'), {stdout = function(cover)
 		awesome.emit_signal('qrlinux::media::get_song_cover', cover)
 	end})
 end)
 
---awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^' .. confdir .. 'scripts/get_song_title.sh -f -g perc'}, function()
-awful.spawn.easy_async('pkill --full --uid' .. username .. " '^" .. confdir .. "scripts/get_song_title.sh -f -g perc'", function()
-	awful.spawn.with_line_callback(awful.util.getdir('config') .. 'scripts/get_song_title.sh -f -g perc', {stdout = function(percent)
+awful.spawn.easy_async({'pkill', '--full', '--uid', username, (confdir..'scripts/get_song_title.sh -f -g perc')}, function()
+--awful.spawn.easy_async_with_shell('pkill --full --uid' .. username .. " '^" .. confdir .. "scripts/get_song_title.sh -f -g perc'", function()
+	awful.spawn.with_line_callback((confdir..'scripts/get_song_title.sh -f -g perc'), {stdout = function(percent)
 		awesome.emit_signal('qrlinux::media::get_song_prog_percent', tonumber(percent))
 	end})
 end)
 
---awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^playerctl status -F'}, function()
-awful.spawn.easy_async('pkill --full --uid ' .. username .. " '^playerctl status -F'", function()
-	awful.spawn.with_line_callback('playerctl status -F', {stdout = function(s)
-		local status = ''
-		if     s == 'Playing' then status = 'play'
-		elseif s == 'Paused'  then status = 'pause'
+awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^playerctl status -F'}, function()
+--awful.spawn.easy_async_with_shell('pkill --full --uid ' .. username .. " '^playerctl status -F'", function()
+	awful.spawn.with_line_callback('playerctl status -F', { stdout = function(s)
+		if     s == 'Playing' then status = true
+		elseif s == 'Paused' or s == 'Stopped' then status = false
+		else status = ''
 		end
 		awesome.emit_signal('qrlinux::media::get_song_status', status)
 	end})

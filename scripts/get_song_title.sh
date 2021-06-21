@@ -65,7 +65,7 @@ get() {
 				out="$("${@}")"
 				[[ "${out}" = "${new_out}" ]] || echo "${out}"
 				new_out="${out}"
-				sleep 0.1
+				sleep 0.3
 			done
 		else
 			"${@}"
@@ -94,6 +94,7 @@ main() {
 			unset COVER
 			COVER="$(playerctl metadata mpris:artUrl 2> /dev/null)"
 			COVER="$(sed 's|^file:\/\/||' <<<"${COVER}")"
+			sleep 0.3
 		done
 		echo "${COVER}"
 		return
@@ -115,6 +116,7 @@ main() {
 	# Also grab the artist name if it's not in the title itself
 	if ! grep -q ' - ' <<<"${SONG_TITLE}"; then
 		SONG_ARTIST="$(playerctl metadata artist 2> /dev/null)"
+		SONG_ARTIST="${SONG_ARTIST/ - Topic/}"
 		FULL_TITLE="${SONG_ARTIST} - ${SONG_TITLE}"
 	else
 		FULL_TITLE="${SONG_TITLE}"
@@ -123,12 +125,12 @@ main() {
 	# Strip prefixes like a genre and suffixes in angle brackets, like '[Monstercat Release]'
 	# if they are enclosed with angle brackets
 	if [[ -z "${NO_STRIP}" ]]; then
-		TITLE_tmp="$(sed 's/-[^-]*//2g' <<<"${FULL_TITLE}")"
-		TITLE_tmp="$(sed 's|^\[.*\] ||' <<<"${TITLE_tmp}" | sed 's|^ ||' | sed 's|^- ||')"
-		TITLE_tmp="$(rev <<<"${TITLE_tmp}")"
+		TITLE_tmp="$(sed 's|\[[^][]*\]||g' <<<"${FULL_TITLE}" | sed 's|^ - ||')"
+		TITLE_tmp="$(sed 's/-[^-]*//2g' <<<"${TITLE_tmp}")"
+		#TITLE_tmp="$(rev <<<"${TITLE_tmp}")"
 		#TITLE_tmp="$(sed 's|^\].*\[||' <<<"${TITLE_tmp}")"
-		TITLE_tmp="${TITLE_tmp/^\].*\[/}"
-		TITLE_tmp="$(rev <<<"${TITLE_tmp}")"
+		#TITLE_tmp="${TITLE_tmp/^\][^][]*\[/}"
+		#TITLE_tmp="$(rev <<<"${TITLE_tmp}")"
 		TITLE_tmp="$(sed 's|free.*download||gI' <<<"${TITLE_tmp}")"
 		TITLE_tmp="$(sed 's|\[\]||g' <<<"${TITLE_tmp}"| sed 's| \- youtube||gI'  | sed 's|official.*video||gI')"
 		TITLE_tmp="${TITLE_tmp/\[\]/}"
@@ -136,13 +138,14 @@ main() {
 		TITLE="${TITLE_tmp}"
 	fi
 
-	TITLE="${TITLE:-FULL_TITLE}"
+	TITLE="${TITLE:-${FULL_TITLE}}"
+	TITLE="${TITLE/\\-/-}"
 
 	if [[ -n "${TITLE_ONLY}" ]]; then
 		local TITLE_NO_ARTIST
 		TITLE_NO_ARTIST="$(grep -o '^.* - ' <<<"${TITLE}")"
 		TITLE_NO_ARTIST="${TITLE/${TITLE_NO_ARTIST}/}"
-		TITLE_NO_ARTIST="$(xargs <<<"${TITLE_NO_ARTIST}")"
+		#TITLE_NO_ARTIST="$(xargs <<<"${TITLE_NO_ARTIST}")"
 		#TITLE_NO_ARTIST="$(sed "s|$(grep -o '^.* - ' <<<${TITLE})||" <<<"${TITLE}")"
 		echo -e "${TITLE_NO_ARTIST}"
 	elif [[ -n "${ARTIST_ONLY}" ]]; then

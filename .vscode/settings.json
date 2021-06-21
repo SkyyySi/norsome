@@ -1,5 +1,16 @@
 {
 	"Lua.diagnostics.disable": [
 		"lowercase-global"
-	]
+	],
+	"Lua.diagnostics.globals": [
+		"client",
+		"screen",
+		"awesome",
+		"root",
+		"mouse",
+		"menu_awesome",
+		"menu_power",
+		"xdgmenu"
+	],
+	"css.validate": false // For rofi's .rasi files
 }

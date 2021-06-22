@@ -45,6 +45,7 @@ editor_cmd  = editor
 config_dir  = awful.util.getdir('config')
 themes_dir  = config_dir .. 'themes/'
 theme_dir   = themes_dir .. theme .. '/'
+local night_mode = true
 
 -- Themes define colours, icons, font and wallpapers.
 beautiful.init(theme_dir .. 'theme.lua')
@@ -171,6 +172,10 @@ qrwidget.systray          = require('widgets.systray')          -- SYSTEM TRAY
 qrwidget.menubutton       = require('widgets.menubutton')       -- START MENU BUTTON
 qrwidget.wallpaper_select = require('widgets.wallpaper_select') -- WALLPAPER SELECTOR
 
+qrwidget.night_mode       = require('night_mode')
+qrwidget.notification_bar = require('notifications') -- NOTIFICATION BAR
+qrwidget.notification_bar()
+
 -- Wallpaper
 local function set_wallpaper(s)
     awful.spawn('nitrogen --restore')
@@ -180,7 +185,9 @@ end
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal('property::geometry', set_wallpaper)
 
--- Make it a local function instead of a global one.
+--naughty.notify{text=hsl(0, 0, 0)}
+
+--[[ -- Make it a local function instead of a global one.
 local myfirstwidget
 -- Define the function for adding the widget. The purpose is to make adding
 -- it to multiple screens easier as well as making it easier to move
@@ -222,7 +229,7 @@ function myfirstwidget(s)
 	-- Return the widget when the function is called, making it usable in awesome.
 	-- Use the name you set above.
 	return s.main_widget
-end
+end ]]
 
 awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
@@ -233,6 +240,94 @@ awful.screen.connect_for_each_screen(function(s)
 
     -- Create a promptbox for each screen
     s.promptbox = awful.widget.prompt()
+
+    --[[ if night_mode then
+        s.night_mode = require('night_mode')
+        local night_mode_button_wibox = wibox {
+            screen  = s,
+            type    = 'utility',
+            width   = 100,
+            height  = 60,
+            opacity = 1,
+            ontop   = true,
+            visible = true,
+        }
+
+        local night_mode_button = wibox.widget {
+            {
+                {
+                    {
+                        widget = wibox.widget.textbox,
+                        text   = 'Night mode!',
+                    },
+                    widget  = wibox.container.margin,
+                    margins = dpi(4),
+                },
+                widget             = wibox.container.background,
+                bg                 = beautiful.button_normal,
+                shape              = gears.shape.rounded_bar,
+                shape_border_width = 2,
+                shape_border_color = beautiful.nord12,
+            },
+            widget  = wibox.container.margin,
+            margins = dpi(4),
+        }
+        buttonify({ widget = night_mode_button.widget })
+
+        night_mode_button_wibox:setup {
+            night_mode_button,
+            layout = wibox.layout.align.horizontal
+        }
+
+        s.night_mode_overlay = wibox {
+            screen            = s,
+            width             = 1920,
+            height            = 1080,
+            type              = 'utility',
+            bg                = '#632b00',
+            opacity           = 0.0,
+            input_passthrough = true,
+            ontop             = true,
+            visible           = true,
+        }
+        s.night_mode_overlay_enabled = false
+        s.night_mode_overlay_timer = nil
+
+        function s.night_mode_overlay_fade(t)
+            s.night_mode_overlay_enabled = t
+            if (s.night_mode_overlay_timer) then s.night_mode_overlay_timer:stop() end
+            if (t == true) then
+                s.night_mode_overlay_timer = gears.timer {
+                    timeout = 0.05,
+                    call_now = true,
+                    autostart = true,
+                    callback = function()
+                        if (s.night_mode_overlay.opacity < 0.5) then
+                            s.night_mode_overlay.opacity = (s.night_mode_overlay.opacity + 0.01)
+                        end
+                    end
+                }
+            elseif (t == false) then
+                s.night_mode_overlay_timer = gears.timer {
+                    timeout = 0.05,
+                    call_now = true,
+                    autostart = true,
+                    callback = function()
+                        if (s.night_mode_overlay.opacity > 0) then
+                            s.night_mode_overlay.opacity = (s.night_mode_overlay.opacity - 0.01)
+                        end
+                    end
+                }
+        end
+        gears.timer {
+                timeout = 1,
+                call_now = true,
+                autostart = true,
+                callback = function()
+                    naughty.notify {text=tostring(s.night_mode_overlay_enabled)}
+                end
+        }
+    end ]]
 
     -- Create the top wibar
     s.topwibar   = awful.wibar({
@@ -256,6 +351,7 @@ awful.screen.connect_for_each_screen(function(s)
         },
         {
 			--myfirstwidget(s),
+            qrwidget.night_mode(s, '#854b11'),
             layout = wibox.layout.fixed.horizontal,
         },
         {

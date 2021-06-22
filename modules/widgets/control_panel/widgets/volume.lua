@@ -78,7 +78,7 @@ function volume_slider(s, w)
 			widget             = wibox.container.background,
 		},
 		strategy = 'exact',
-		width    = w - dpi(20),
+		--width    = w - dpi(20),
 		height   = dpi(60),
 		widget   = wibox.container.constraint
 	}

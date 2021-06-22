@@ -20,6 +20,9 @@ function control_panel_widget(s)
 		width    = s.control_panel.width,
 		layout   = wibox.layout.flex.vertical,
 	}
+	--[[if (s == screen.primary()) then
+		s.control_panel.control_panel.visible = true
+	end --]]
 
 	s.control_panel.control_panel:setup {
 		direction = 'east',

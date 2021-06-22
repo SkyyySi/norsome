@@ -54,7 +54,7 @@ configuration {
     background-color: @background;
 	margin:                      0;
     padding:                     5;
-	border-radius:               0;
+	border-radius:               20;
 	border:                      2;
 	border-color:                #d8dee9;
 }

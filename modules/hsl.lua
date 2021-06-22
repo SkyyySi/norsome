@@ -40,6 +40,7 @@ function hslToHex(h, s, l, a)
 	if a then out = out .. string.format('%x', round(a * 255)) end
 	--if (#out < 6) then out = '0'..out end
 	return(tostring('#'..out))
+	--return(tostring('#'..out_r))
 end
 
 --[[

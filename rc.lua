@@ -438,7 +438,7 @@ root.keys(globalkeys)
 awful.rules.rules = {
     -- All clients will match this rule.
     { rule = { },
-      properties = { border_width = beautiful.border_width,
+      properties = { border_width = 0,
                      border_color = beautiful.border_normal,
                      focus = awful.client.focus.filter,
                      raise = true,
@@ -552,6 +552,12 @@ end)
 
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
 client.connect_signal('request::titlebars', function(c)
+    local bg_color = beautiful.bg_normal
+
+    if c == client.focus then
+        bg_color = beautiful.bg_focus
+    end
+
     -- buttons for the titlebar
     local buttons = gears.table.join(
         awful.button({ }, 1, function()
@@ -568,34 +574,76 @@ client.connect_signal('request::titlebars', function(c)
         size           = beautiful.titlebar_size or dpi(28),
         enable_tooltip = false,
         position       = 'top',
+        bg             = '#00000000', -- transparency
     })
 
     top_titlebar:setup {
-        { -- Left
-            awful.titlebar.widget.iconwidget(c),
-            buttons = buttons,
-            layout  = wibox.layout.fixed.horizontal
-        },
-        { -- Middle
-            { -- Title
-                align  = 'center',
-                font   = 'Source Sans Pro bold 12',
-                widget = awful.titlebar.widget.titlewidget(c)
+        {
+            {
+                {
+                    { -- Left
+                        awful.titlebar.widget.iconwidget(c),
+                        buttons = buttons,
+                        layout  = wibox.layout.fixed.horizontal
+                    },
+                    { -- Middle
+                        { -- Title
+                            align  = 'center',
+                            font   = 'Source Sans Pro bold 12',
+                            widget = awful.titlebar.widget.titlewidget(c)
+                        },
+                        buttons = buttons,
+                        layout  = wibox.layout.flex.horizontal
+                    },
+                    { -- Right
+                        awful.titlebar.widget.floatingbutton (c),
+                        awful.titlebar.widget.stickybutton   (c),
+                        awful.titlebar.widget.ontopbutton    (c),
+                        --awful.titlebar.widget.minimizebutton (c),
+                        --awful.titlebar.widget.maximizedbutton(c),
+                        awful.titlebar.widget.closebutton    (c),
+                        layout = wibox.layout.fixed.horizontal
+                    },
+                    layout = wibox.layout.align.horizontal
+                },
+                shape = function(cr, width, height)
+                    gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, (beautiful.titlebar_radius or dpi(20)))
+                end,
+                bg = bg_color,
+                widget = wibox.container.background
             },
-            buttons = buttons,
-            layout  = wibox.layout.flex.horizontal
+            top    = beautiful.border_width,
+            left   = beautiful.border_width,
+            right  = beautiful.border_width,
+            widget = wibox.container.margin
         },
-        { -- Right
-            awful.titlebar.widget.floatingbutton (c),
-            awful.titlebar.widget.stickybutton   (c),
-            awful.titlebar.widget.ontopbutton    (c),
-            --awful.titlebar.widget.minimizebutton (c),
-            --awful.titlebar.widget.maximizedbutton(c),
-            awful.titlebar.widget.closebutton    (c),
-            layout = wibox.layout.fixed.horizontal
-        },
-        layout = wibox.layout.align.horizontal
+        shape = function(cr, width, height)
+            gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, (beautiful.titlebar_radius or dpi(20)))
+        end,
+        bg     = c.border_color,
+        widget = wibox.container.background
     }
+    -- These are your "borders"
+    local left_titlebar = awful.titlebar(c, {
+        size            = beautiful.border_width,
+        enable_tooltip  = false,
+        position        = 'left',
+        bg              = c.border_color
+    })
+
+    local right_titlebar = awful.titlebar(c, {
+        size            = beautiful.border_width,
+        enable_tooltip  = false,
+        position        = 'right',
+        bg              = c.border_color
+    })
+
+    local bottom_titlebar = awful.titlebar(c, {
+        size            = beautiful.border_width,
+        enable_tooltip  = false,
+        position        = 'bottom',
+        bg              = c.border_color
+    })
 
     --[[
     local bottom_titlebar = awful.titlebar(c, {
@@ -639,16 +687,23 @@ client.connect_signal('mouse::enter', function(c)
     c:emit_signal('request::activate', 'mouse_enter', {raise = false})
 end)
 
-client.connect_signal('focus', function(c)   c.border_color = beautiful.border_focus end)
-client.connect_signal('unfocus', function(c) c.border_color = beautiful.border_normal end)
+client.connect_signal('focus', function(c)
+    c.border_color = beautiful.border_focus
+    client.emit_signal('request::titlebars', c)
+end)
+client.connect_signal('unfocus', function(c)
+    c.border_color = beautiful.border_normal
+    client.emit_signal('request::titlebars', c)
+end)
 -- }}}
 
 -- Add shadows to floating windows
-local true_useless_gap = beautiful.useless_gap
+--local true_useless_gap = beautiful.useless_gap
 local orig_client_size = {}
 screen.connect_signal('arrange', function (s)
     local layout = s.selected_tag.layout.name
     local is_single_client = #s.clients == 1
+    --[[
     for _, c in pairs(s.clients) do
         if (layout == 'floating' or layout == 'max') then
             beautiful.useless_gap = 0
@@ -656,20 +711,31 @@ screen.connect_signal('arrange', function (s)
             beautiful.useless_gap = true_useless_gap
         end
     end
+    --]]
 
     for _, c in pairs(s.clients) do
         if layout == 'floating' or c.floating and not c.maximized then
-            awful.titlebar.show(c)
-   			awful.spawn('xprop -id ' .. c.window .. ' -f _COMPTON_SHADOW 32c -set _COMPTON_SHADOW 1', false)
+            -- hide x11 borders and show titlebars
+            awful.titlebar.show(c, 'top')
+            awful.titlebar.show(c, 'right')
+            awful.titlebar.show(c, 'left')
+            awful.titlebar.show(c, 'bottom')
+            c.border_width = 0
+
+   		    awful.spawn('xprop -id ' .. c.window .. ' -f _COMPTON_SHADOW 32c -set _COMPTON_SHADOW 1', false)
             c.shape = function(cr, width, height)
-                gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, dpi(20))
+                gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, ((beautiful.titlebar_radius or dpi(20)) - dpi(6)))
             end
         else
-            awful.titlebar.hide(c)
+            -- hide titlebars and show x11 borders
+            awful.titlebar.hide(c, 'top')
+            awful.titlebar.hide(c, 'bottom')
+            awful.titlebar.hide(c, 'left')
+            awful.titlebar.hide(c, 'right')
+            c.border_width = beautiful.border_width
+
     		awful.spawn('xprop -id ' .. c.window .. ' -f _COMPTON_SHADOW 32c -set _COMPTON_SHADOW 0', false)
-            c.shape = function(cr, width, height)
-                gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, 0)
-            end
+            c.shape = gears.shape.square
         end
     end
 end)
@@ -677,6 +743,7 @@ end)
 -- Autostart
 awful.spawn.with_shell(os.getenv('HOME') .. '/.screenlayout/layout.sh')
 awful.spawn.with_shell(config_dir .. '/scripts/autostart.sh')
+--[[
 --awful.spawn.with_shell('awesome-client '..'''..'naughty.notify({text = 'It works'})'..''')
 --dofile(awful.util.getdir('config') .. 'config/autostart.lua')
 --awful.spawn('hsetroot -add '#2e3440' -add '#eceff4' -gradient 180')
@@ -687,15 +754,16 @@ awful.spawn.with_shell(config_dir .. '/scripts/autostart.sh')
 --awful.spawn('lxqt-policykit-agent')
 --awful.spawn.with_shell('picom --config ' .. config_dir .. '/other/picom/picom.conf&')
 --naughty.notify { text = autostart }
+--]]
 
 ----------------------------------------------------------------------------------------
 
 --for _, c in pairs(client.get()) do
-client.connect_signal('manage', function(c)
-    c:connect_signal('property::floating', function()
-        c:set_height(c.height - (beautiful.titlebar_size or dpi(28)))
-    end)
-end)
+--client.connect_signal('manage', function(c)
+--    c:connect_signal('property::floating', function()
+--        c:set_height(c.height - (beautiful.titlebar_size or dpi(28)))
+--    end)
+--end)
 
 --[[
 local testbox = wibox {

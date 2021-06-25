@@ -58,10 +58,10 @@ local function night_mode(s, c)
 		if (s.night_mode_overlay_timer) then s.night_mode_overlay_timer:stop() end
 		if (t == true) then
 			s.night_mode_overlay_timer = gears.timer {
-				timeout = 0.05,
-				call_now = true,
+				timeout   = 0.05,
+				call_now  = true,
 				autostart = true,
-				callback = function()
+				callback  = function()
 					if (s.night_mode_overlay.opacity < 0.1) then
 						s.night_mode_overlay.visible = true
 						s.night_mode_overlay.opacity = (s.night_mode_overlay.opacity + 0.01)
@@ -70,10 +70,10 @@ local function night_mode(s, c)
 			}
 		elseif (t == false) then
 			s.night_mode_overlay_timer = gears.timer {
-				timeout = 0.05,
-				call_now = true,
+				timeout   = 0.05,
+				call_now  = true,
 				autostart = true,
-				callback = function()
+				callback  = function()
 					if (s.night_mode_overlay.opacity > 0) then
 						s.night_mode_overlay.opacity = (s.night_mode_overlay.opacity - 0.01)
 					elseif (s.night_mode_overlay.opacity <= 0.001) then

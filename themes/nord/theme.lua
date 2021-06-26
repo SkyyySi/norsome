@@ -66,18 +66,23 @@ theme.menubutton_press   = theme.button_press      -- pressed
 theme.menubutton_release = theme.button_enter      -- released
 theme.menubutton_leave   = theme.menubutton_normal -- released
 
-theme.bg_systray = theme.button_normal or theme.nord1
-
 theme.taglist_bg_empty     = theme.nord1
 theme.taglist_bg_occupied  = theme.nord2
 theme.taglist_disable_icon = true
 theme.taglist_font         = 'Source Code Pro black 16'
 --theme.taglist_shape        = gears.shape.rounded_bar
 
-theme.bar_bg = theme.nord0 .. 'E0'
+--theme.bar_bg = theme.nord0 .. 'E0'
+theme.bar_bg = gears.color {
+    type  = 'linear',
+    from  = { 0, dpi(40) },
+    to    = { 0, 0 },
+    stops = { { 0, theme.nord0 }, { 1, theme.nord3 } }
+}
 
 theme.control_panel_bg = theme.nord1 .. 'E0'
 
+theme.bg_systray           = theme.button_normal or theme.nord1
 theme.systray_icon_spacing = dpi(10)
 theme.systray_icon_size    = dpi(15)
 

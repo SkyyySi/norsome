@@ -331,6 +331,7 @@ awful.screen.connect_for_each_screen(function(s)
 
     -- Create the top wibar
     s.topwibar   = awful.wibar({
+        bg       = (beautiful.bar_bg or ((beautiful.bg_normal or '#2E3440') .. 'E0')),
         position = 'top',
         stretch  = true,
         screen   = s,
@@ -574,7 +575,7 @@ client.connect_signal('request::titlebars', function(c)
         size           = beautiful.titlebar_size or dpi(28),
         enable_tooltip = false,
         position       = 'top',
-        bg             = '#00000000', -- transparency
+        bg             = '#00000030', -- transparency; may conflict with transparent titlebars by darkening them, but this makes shadows basically seamless.
     })
 
     top_titlebar:setup {
@@ -583,7 +584,9 @@ client.connect_signal('request::titlebars', function(c)
                 {
                     { -- Left
                         awful.titlebar.widget.iconwidget(c),
-                        buttons = buttons,
+                        awful.titlebar.widget.floatingbutton (c),
+                        awful.titlebar.widget.stickybutton   (c),
+                        awful.titlebar.widget.ontopbutton    (c),
                         layout  = wibox.layout.fixed.horizontal
                     },
                     { -- Middle
@@ -596,11 +599,8 @@ client.connect_signal('request::titlebars', function(c)
                         layout  = wibox.layout.flex.horizontal
                     },
                     { -- Right
-                        awful.titlebar.widget.floatingbutton (c),
-                        awful.titlebar.widget.stickybutton   (c),
-                        awful.titlebar.widget.ontopbutton    (c),
-                        --awful.titlebar.widget.minimizebutton (c),
-                        --awful.titlebar.widget.maximizedbutton(c),
+                        awful.titlebar.widget.minimizebutton (c),
+                        awful.titlebar.widget.maximizedbutton(c),
                         awful.titlebar.widget.closebutton    (c),
                         layout = wibox.layout.fixed.horizontal
                     },
@@ -699,16 +699,15 @@ end)
 
 -- Add shadows to floating windows
 --local true_useless_gap = beautiful.useless_gap
-local orig_client_size = {}
+--local orig_client_size = {}
 screen.connect_signal('arrange', function (s)
     local layout = s.selected_tag.layout.name
     local is_single_client = #s.clients == 1
     --[[
     for _, c in pairs(s.clients) do
+        beautiful.useless_gap = true_useless_gap
         if (layout == 'floating' or layout == 'max') then
             beautiful.useless_gap = 0
-        else
-            beautiful.useless_gap = true_useless_gap
         end
     end
     --]]
@@ -724,7 +723,7 @@ screen.connect_signal('arrange', function (s)
 
    		    awful.spawn('xprop -id ' .. c.window .. ' -f _COMPTON_SHADOW 32c -set _COMPTON_SHADOW 1', false)
             c.shape = function(cr, width, height)
-                gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, ((beautiful.titlebar_radius or dpi(20)) - dpi(6)))
+                gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, ((beautiful.titlebar_radius or dpi(20)) - dpi(8)))
             end
         else
             -- hide titlebars and show x11 borders
@@ -758,12 +757,28 @@ awful.spawn.with_shell(config_dir .. '/scripts/autostart.sh')
 
 ----------------------------------------------------------------------------------------
 
---for _, c in pairs(client.get()) do
---client.connect_signal('manage', function(c)
---    c:connect_signal('property::floating', function()
---        c:set_height(c.height - (beautiful.titlebar_size or dpi(28)))
---    end)
---end)
+client.connect_signal('manage', function(c)
+    if not c.floating then
+        c.floating_width  = c.width
+        c.floating_height = c.height
+        c.floating_x      = c.x
+        c.floating_y      = c.y
+    end
+
+    c:connect_signal('property::floating', function()
+        if c.floating then
+            c:set_width ( (c.floating_width  or c.width ) - (beautiful.border_width or 0) )
+            c:set_height( (c.floating_height or c.height) - ( (beautiful.titlebar_size or dpi(28)) + (beautiful.border_width or 0) ) )
+            c:set_x(c.floating_x or c.x)
+            c:set_y(c.floating_y or c.y)
+        else
+            c.floating_width  = c.width
+            c.floating_height = c.height
+            c.floating_x      = c.x
+            c.floating_y      = c.y
+        end
+    end)
+end)
 
 --[[
 local testbox = wibox {

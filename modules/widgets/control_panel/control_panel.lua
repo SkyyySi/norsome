@@ -26,19 +26,13 @@ function control_panel_widget(s)
 
 	s.control_panel.control_panel:setup {
 		direction = 'east',
-		layout    = wibox.layout.flex.vertical,
+		layout    = wibox.layout.align.vertical,
+		nil,
+		nil,
 		{
 			{
 				{
-					nil,
-					layout = wibox.layout.fixed.horizontal,
-				},
-				{
-					nil,
-					layout = wibox.layout.fixed.horizontal,
-				},
-				{
-					s.control_panel.widget.volume_slider(s, s.control_panel.width),
+					s.control_panel.widget.volume_slider(),
 					layout = wibox.layout.fixed.horizontal,
 				},
 				bg     = beautiful.nord2,

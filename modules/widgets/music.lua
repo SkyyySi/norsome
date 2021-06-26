@@ -7,35 +7,36 @@ function music_button(s)
     s.arrow_width = dpi(10)
 	s.shape_size = dpi(20)
     s.shape = infobubble(s.shape_size, s.arrow_width)
-	--return(nil)
-	--local get_song
-    --function get_song(f)
-    --    awful.spawn.easy_async_with_shell(awful.util.getdir('config') .. '/scripts/get_song_title.sh -t', function(song)
-    --        f(song)
-    --    end)
-    --end
+	--[[
+	local get_song
+    function get_song(f)
+        awful.spawn.easy_async_with_shell(awful.util.getdir('config') .. '/scripts/get_song_title.sh -t', function(song)
+            f(song)
+        end)
+    end
 
-	--local get_artist
-    --function get_artist(f)
-    --    awful.spawn.easy_async_with_shell(awful.util.getdir('config') .. '/scripts/get_song_title.sh -a', function(artist)
-    --        f(artist)
-    --    end)
-    --end
+	local get_artist
+    function get_artist(f)
+        awful.spawn.easy_async_with_shell(awful.util.getdir('config') .. '/scripts/get_song_title.sh -a', function(artist)
+            f(artist)
+        end)
+    end
 
-	--local get_cover
-	--function get_cover(f)
-	--	awful.spawn.easy_async_with_shell(awful.util.getdir('config') .. '/scripts/get_song_title.sh -c', function(img)
-	--		f(img)
-	--	end)
-	--end
+	local get_cover
+	function get_cover(f)
+		awful.spawn.easy_async_with_shell(awful.util.getdir('config') .. '/scripts/get_song_title.sh -c', function(img)
+			f(img)
+		end)
+	end
 
-	--local get_status
-	--function get_status(f)
-	--	awful.spawn.easy_async_with_shell('playerctl status', function(status)
-	--		f(status)
-	--		--naughty.notify({text = 'Status: ' .. status})
-	--	end)
-	--end
+	local get_status
+	function get_status(f)
+		awful.spawn.easy_async_with_shell('playerctl status', function(status)
+			f(status)
+			--naughty.notify({text = 'Status: ' .. status})
+		end)
+	end
+	--]]
 
 	-- The text on the button is a seperate widget so it's easier
 	-- to change using a signal
@@ -166,7 +167,13 @@ function music_button(s)
 		max_value        = 100,
 		value            = 50,
 		background_color = (beautiful.nord1 .. '80') or '#3B425280',
-		color            = beautiful.nord9 or '#81A1C1',
+		--color            = beautiful.nord9 or '#81A1C1',
+		color = gears.color {
+			type  = 'linear',
+			from  = { 0, 0 },
+			to    = { dpi(250), 0 },
+			stops = { { 0, beautiful.nord11 }, { 0.5, beautiful.nord12 }, { 1, beautiful.nord13 } }
+		},
 		border_width     = dpi(1),
 		border_color     = beautiful.nord4,
 		shape            = gears.shape.rounded_bar,

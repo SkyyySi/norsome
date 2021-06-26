@@ -42,16 +42,20 @@ theme.fg_focus       = theme.nord4
 theme.fg_urgent      = theme.nord0
 theme.fg_minimize    = theme.nord4
 
-theme.useless_gap    = dpi(2)
-theme.border_width   = dpi(2)
-theme.border_normal  = theme.nord3
-theme.border_focus   = theme.nord4
-theme.border_marked  = theme.nord4
+-- Titlebars and borders
+theme.titlebar_bg_normal = theme.nord1 or '#353C4A'
+theme.titlebar_size      = dpi(28)
+theme.titlebar_radius    = dpi(20)
+theme.useless_gap        = dpi(2)
+theme.border_width       = dpi(2)
+theme.border_normal      = theme.nord3
+theme.border_focus       = theme.nord4
+theme.border_marked      = theme.nord4
 
-theme.button_normal  = theme.nord1        -- default
-theme.button_enter   = theme.nord2        -- hovered
-theme.button_press   = theme.nord3        -- pressed
-theme.button_release = theme.button_enter -- released
+theme.button_normal       = theme.nord1        -- default
+theme.button_enter        = theme.nord2        -- hovered
+theme.button_press        = theme.nord3        -- pressed
+theme.button_release      = theme.button_enter -- released
 theme.button_border_shape = gears.shape.rounded_bar
 theme.button_border_color = theme.nord4 or '#FFFFFF'
 theme.button_border_width = dpi(1)
@@ -70,15 +74,12 @@ theme.taglist_disable_icon = true
 theme.taglist_font         = 'Source Code Pro black 16'
 --theme.taglist_shape        = gears.shape.rounded_bar
 
-theme.control_panel_bg = theme.nord1 .. 'D0'
+theme.bar_bg = theme.nord0 .. 'E0'
+
+theme.control_panel_bg = theme.nord1 .. 'E0'
 
 theme.systray_icon_spacing = dpi(10)
 theme.systray_icon_size    = dpi(15)
-
--- Titlebars
-theme.titlebar_bg_normal = theme.nord1 or '#353C4A'
-theme.titlebar_size      = dpi(28)
-theme.titlebar_radius    = dpi(20)
 
 -- There are other variable sets
 -- overriding the default one when

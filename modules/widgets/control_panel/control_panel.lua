@@ -25,51 +25,45 @@ function control_panel_widget(s)
 	qrwidget.music(s)
 	qrwidget.night_mode(s, '#854b11')
 
+	local toggle_button_buttons = wibox.widget {
+		toggle_button {
+			icon          = beautiful.icon.night_mode,
+			--icon_bg_shape = gears.shape.rectangle,
+			title         = 'Night mode',
+			deactivate    = 'always',
+			active        = false,
+			lclick        = function()
+				awesome.emit_signal('qrlinux::util::night_mode')
+			end,
+		}, -- A1
+		toggle_button {
+			icon = beautiful.icon.web,
+			title = 'Wifi',
+			deactivate = 'signal',
+			control_signal = 'qrlinux::wifi::enabled',
+			lclick        = function()
+				awesome.emit_signal('qrlinux::wifi::toggle')
+			end,
+		}, -- B1
+		toggle_button { icon = beautiful.icon.terminal, lclick = function () awful.spawn(terminal) end, title = 'Terminal' }, -- C1
+		toggle_button { deactivate = 'always' }, -- D1
+		toggle_button { deactivate = 'always' }, -- A2
+		toggle_button { deactivate = 'always' }, -- B2
+		toggle_button { deactivate = 'always' }, -- C2
+		toggle_button { deactivate = 'always' }, -- D2
+		homogeneous     = true,
+		expand          = true,
+		forced_num_cols = 4,
+		spacing         = dpi(5),
+		layout          = wibox.layout.grid,
+	}
+
 	local toggle_button_container = wibox.widget {
 		{
 			{
 				{
 					{
-						{
-							toggle_button {
-								icon          = beautiful.icon.night_mode,
-								--icon_bg_shape = gears.shape.rectangle,
-								title         = 'Night mode',
-								deactivate    = 'always',
-								active        = false,
-								lclick        = function()
-									awesome.emit_signal('qrlinux::util::night_mode')
-								end,
-							}, -- A1
-							toggle_button {
-								icon = beautiful.icon.web,
-								title = 'Wifi',
-								deactivate = 'signal',
-								control_signal = 'qrlinux::wifi::enabled',
-								lclick        = function()
-									awesome.emit_signal('qrlinux::wifi::toggle')
-								end,
-							}, -- B1
-							toggle_button { icon = beautiful.icon.terminal, lclick = function () awful.spawn(terminal) end, title = 'Terminal' }, -- C1
-							toggle_button { deactivate = 'always' }, -- D1
-							toggle_button { deactivate = 'always' }, -- A2
-							toggle_button { deactivate = 'always' }, -- B2
-							toggle_button { deactivate = 'always' }, -- C2
-							toggle_button { deactivate = 'always' }, -- D2
-							toggle_button { deactivate = 'always' }, -- A3
-							toggle_button { deactivate = 'always' }, -- B3
-							toggle_button { deactivate = 'always' }, -- C3
-							toggle_button { deactivate = 'always' }, -- D3
-							toggle_button { deactivate = 'always' }, -- A4
-							toggle_button { deactivate = 'always' }, -- B4
-							toggle_button { deactivate = 'always' }, -- C4
-							toggle_button { deactivate = 'always' }, -- D4
-							homogeneous     = true,
-							expand          = true,
-							forced_num_cols = 4,
-							spacing         = dpi(5),
-							layout          = wibox.layout.grid,
-						},
+						toggle_button_buttons,
 						bottom = dpi(16),
 						widget = wibox.container.margin,
 					},
@@ -79,7 +73,7 @@ function control_panel_widget(s)
 						height   = dpi(130),
 						widget   = wibox.container.constraint,
 					},
-					layout  = wibox.layout.align.vertical,
+					layout = wibox.layout.align.vertical,
 				},
 				margins = dpi(16),
 				widget  = wibox.container.margin,
@@ -97,26 +91,111 @@ function control_panel_widget(s)
 	}
 	--toggle_button_container.widget.widget.widget:add_widget_at(toggle_button_container_textbox, 2, 1, 1, 2)
 
+	naughty.expiration_paused = true
+	naughty.expirationpause   = naughty.expiration_paused -- Workaround for the button erroring out when naughty.expiration_paused is true.
+	local notification_container = wibox.widget {
+		-- Add a button to dismiss all notifications, because why not.
+		{
+			{
+				text   = 'Dismiss all',
+				align  = 'center',
+				valign = 'center',
+				widget = wibox.widget.textbox,
+			},
+			buttons = gears.table.join(
+				awful.button({ }, 1, function()
+					naughty.expiration_paused = false
+					naughty.destroy_all_notifications()
+					naughty.expiration_paused = naughty.expirationpause
+				end)
+			),
+			forced_width       = dpi(75),
+			shape              = gears.shape.rounded_bar,
+			shape_border_width = dpi(1),
+			shape_border_color = beautiful.bg_highlight,
+			widget = wibox.container.background,
+		},
+		{
+			base_layout = wibox.widget {
+				spacing_widget = wibox.widget {
+					orientation = 'horizontal',
+					span_ratio  = 1,
+					widget      = wibox.widget.separator,
+				},
+				forced_height = dpi(30),
+				spacing       = dpi(3),
+				layout        = wibox.layout.flex.vertical,
+			},
+			widget_template = {
+				naughty.widget.icon,
+				{
+					naughty.widget.title,
+					naughty.widget.message,
+					{
+						layout = wibox.widget {
+							-- Adding the wibox.widget allows to share a
+							-- single instance for all spacers.
+							spacing_widget = wibox.widget {
+								orientation = 'vertical',
+								span_ratio  = 0.9,
+								widget      = wibox.widget.separator,
+							},
+							spacing = dpi(3),
+							layout  = wibox.layout.flex.horizontal,
+						},
+						widget = naughty.list.widgets,
+					},
+					layout = wibox.layout.align.horizontal,
+				},
+				spacing    = 0,
+				fill_space = false,
+				layout     = wibox.layout.fixed.horizontal,
+			},
+			widget = naughty.list.notifications,
+		},
+		layout = wibox.layout.align.vertical,
+	}
+
 	s.control_panel.control_panel:setup {
 		direction = 'east',
-		layout    = wibox.layout.fixed.vertical,
+		layout    = wibox.layout.align.vertical,
 		{
 			{
 				{
-					s.control_panel.widget.volume_slider(),
-					layout = wibox.layout.fixed.horizontal,
+					{
+						s.control_panel.widget.volume_slider(),
+						layout = wibox.layout.fixed.horizontal,
+					},
+					bg     = beautiful.nord2,
+					widget = wibox.container.background,
+					layout = wibox.layout.fixed.vertical,
 				},
-				bg     = beautiful.nord2,
-				widget = wibox.container.background,
-				layout = wibox.layout.fixed.vertical,
+				top    = dpi(16),
+				left   = dpi(16),
+				right  = dpi(16),
+				widget = wibox.container.margin,
 			},
-			top    = dpi(16),
-			left   = dpi(16),
-			right  = dpi(16),
-			widget = wibox.container.margin,
+			toggle_button_container,
+			layout = wibox.layout.fixed.vertical,
 		},
-		toggle_button_container,
-		nil,
+		{
+			{
+				{
+					{
+						widget = notification_container,
+					},
+					margins = dpi(16),
+					widget  = wibox.container.margin,
+				},
+				bg                 = beautiful.nord0,
+				shape              = rounded_rectangle(dpi(20)),
+				shape_border_width = dpi(1),
+				shape_border_color = beautiful.nord4,
+				widget             = wibox.container.background,
+			},
+			margins = dpi(16),
+			widget  = wibox.container.margin,
+		},
 	}
 
 	s.control_panel.control_panel_button = wibox.widget{

@@ -1,3 +1,4 @@
+--[[
 naughty.expiration_paused = true
 
 local function notification_bar()
@@ -97,3 +98,5 @@ local function notification_bar()
 end
 
 return(notification_bar)
+--]]
+return(nil)

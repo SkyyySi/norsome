@@ -172,8 +172,8 @@ qrwidget.menubutton       = require('widgets.menubutton')       -- START MENU BU
 qrwidget.wallpaper_select = require('widgets.wallpaper_select') -- WALLPAPER SELECTOR
 
 qrwidget.night_mode       = require('night_mode')
-qrwidget.notification_bar = require('notifications') -- NOTIFICATION BAR
-qrwidget.notification_bar()
+--qrwidget.notification_bar = require('notifications') -- NOTIFICATION BAR
+--qrwidget.notification_bar()
 
 qrwidget.control_panel    = require('modules.widgets.control_panel') -- CONTROL PANEL
 

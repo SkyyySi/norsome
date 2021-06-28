@@ -86,15 +86,27 @@ local function night_mode(s, c)
 
 	night_mode_button:connect_signal('button::press', function(_,_,_,b)
 		if (b == 1) then
-			awful.screen.connect_for_each_screen(function(s)
-				--s.night_mode_overlay.visible = (not s.night_mode_overlay.visible)
-				s.night_mode_overlay_enabled = (not s.night_mode_overlay_enabled)
-				s.night_mode_overlay_fade(s.night_mode_overlay_enabled)
-			end)
+			awesome.emit_signal('qrlinux::util::night_mode')
+			--awful.screen.connect_for_each_screen(function(s)
+			--	--s.night_mode_overlay.visible = (not s.night_mode_overlay.visible)
+			--	s.night_mode_overlay_enabled = (not s.night_mode_overlay_enabled)
+			--	s.night_mode_overlay_fade(s.night_mode_overlay_enabled)
+			--end)
 		end
 	end)
 
 	return(night_mode_button)
 end
+
+-- This code needs to be outside of that function, since otherwise,
+-- a connection would get established for each screen, which is not
+-- just not necessery but also prevents it from working at all
+-- with an even amount of connected monitors.
+awesome.connect_signal('qrlinux::util::night_mode', function()
+	awful.screen.connect_for_each_screen(function(s)
+		s.night_mode_overlay_enabled = (not s.night_mode_overlay_enabled)
+		s.night_mode_overlay_fade(s.night_mode_overlay_enabled)
+	end)
+end)
 
 return(night_mode)

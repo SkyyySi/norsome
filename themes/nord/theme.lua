@@ -57,7 +57,7 @@ theme.button_enter        = theme.nord2        -- hovered
 theme.button_press        = theme.nord3        -- pressed
 theme.button_release      = theme.button_enter -- released
 theme.button_border_shape = gears.shape.rounded_bar
-theme.button_border_color = theme.nord4 or '#FFFFFF'
+theme.button_border_color = theme.nord4 or '#D8DEE9'
 theme.button_border_width = dpi(1)
 
 theme.menubutton_normal  = '#00000000'             -- default
@@ -72,15 +72,15 @@ theme.taglist_disable_icon = true
 theme.taglist_font         = 'Source Code Pro black 16'
 --theme.taglist_shape        = gears.shape.rounded_bar
 
---theme.bar_bg = theme.nord0 .. 'E0'
-theme.bar_bg = gears.color {
+theme.bar_bg = theme.nord0 .. 'E0'
+--[[ theme.bar_bg = gears.color {
     type  = 'linear',
     from  = { 0, dpi(40) },
     to    = { 0, 0 },
     stops = { { 0, theme.nord0 }, { 1, theme.nord3 } }
-}
+} --]]
 
-theme.control_panel_bg = theme.nord1 .. 'E0'
+theme.control_panel_bg = theme.nord1 .. 'CC'
 
 theme.bg_systray           = theme.button_normal or theme.nord1
 theme.systray_icon_spacing = dpi(10)
@@ -183,13 +183,14 @@ theme.icon = {}
 
 --- ICONS ---
 --theme.awesome_icon = theme_dir .. 'qrlinux/QRLinux-logo.svg' -- main logo
-theme.awesome_icon  = theme_dir .. 'qrlinux/QRLinux-logo-nobg.svg' -- main logo
-theme.icon.power    = theme_dir .. 'qrlinux/power-button.svg' -- power (off) button
-theme.icon.app      = theme_dir .. 'qrlinux/generic-app.svg' -- symbol of a generic app
-theme.icon.terminal = theme_dir .. 'qrlinux/terminal.svg'
-theme.icon.folder   = theme_dir .. 'qrlinux/folder.svg'
-theme.icon.web      = theme_dir .. 'qrlinux/web.svg'
-theme.icon.note     = theme_dir .. 'qrlinux/musical-note.svg'
+theme.awesome_icon    = theme_dir .. 'qrlinux/QRLinux-logo-nobg.svg' -- main logo
+theme.icon.power      = theme_dir .. 'qrlinux/power-button.svg' -- power (off) button
+theme.icon.app        = theme_dir .. 'qrlinux/generic-app.svg' -- symbol of a generic app
+theme.icon.terminal   = theme_dir .. 'qrlinux/terminal.svg'
+theme.icon.folder     = theme_dir .. 'qrlinux/folder.svg'
+theme.icon.web        = theme_dir .. 'qrlinux/web.svg'
+theme.icon.note       = theme_dir .. 'qrlinux/musical-note.svg'
+theme.icon.night_mode = theme_dir .. 'qrlinux/moon.svg'
 
 -- Define the icon theme for application icons. If not set then the icons
 -- from /usr/share/icons and /usr/share/icons/hicolor will be used.

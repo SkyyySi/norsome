@@ -1,3 +1,4 @@
+local rounded_rectangle = require('rounded_rectangle')
 --[[
 Experimentation with gears.color, please ignore.
 local function gen_color(x0, y0, x1, y1, stop)
@@ -61,7 +62,7 @@ function volume_slider()
 		    if #v == 1 then v = (v .. '  ')
 		elseif #v == 2 then v = (v .. ' ' )
 		end
-		
+
 			if volume == 0 then text = ' 🔇 ' .. v .. ' '
 		elseif volume < 25 then text = ' 🔈 ' .. v .. ' '
 		elseif volume < 75 then text = ' 🔉 ' .. v .. ' '
@@ -105,10 +106,10 @@ function volume_slider()
 				right  = dpi(15),
 				widget = wibox.container.margin,
 			},
-			bg                 = beautiful.nord0,
-			shape              = gears.shape.rounded_bar,
-			shape_border_color = beautiful.nord4,
-			shape_border_width = dpi(2),
+			bg                 = beautiful.control_panel_volume_bg or beautiful.nord0 or '#2E3440',
+			shape              = beautiful.control_panel_volume_shape or rounded_rectangle(dpi(20)),
+			shape_border_width = beautiful.control_panel_volume_shape_width or dpi(1),
+			shape_border_color = beautiful.control_panel_volume_shape_color or beautiful.nord4 or '#D8DEE9',
 			widget             = wibox.container.background,
 		},
 		strategy = 'exact',

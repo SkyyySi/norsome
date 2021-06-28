@@ -74,8 +74,8 @@ modkey = 'Mod4'
 awful.layout.layouts = {
     awful.layout.suit.spiral,
     awful.layout.suit.floating,
-    awful.layout.suit.max,
---[[
+    --awful.layout.suit.max,
+--[[ Full list:
     awful.layout.suit.floating,
     awful.layout.suit.tile,
     awful.layout.suit.tile.left,
@@ -158,12 +158,11 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 ----------------------------------------------------------------------------------------------------
 
 -- {{{ Wibar
-local qrwidget = {}
+qrwidget = {}
 
 qrwidget.music            = require('widgets.music')            -- MUSIC CONTROL
 qrwidget.volume           = require('widgets.volume')           -- VOLUME CONTROL
 qrwidget.calendar         = require('widgets.calendar')         -- CALENDAR
-qrwidget.control_panel    = require('modules.widgets.control_panel')    -- CONTROL PANEL
 qrwidget.kbdlayout        = require('widgets.keyboard')         -- KEYBOARD LAYOUT
 qrwidget.taglist          = require('widgets.taglist')          -- TAGLIST
 qrwidget.tasklist         = require('widgets.tasklist')         -- TASKLIST
@@ -175,6 +174,8 @@ qrwidget.wallpaper_select = require('widgets.wallpaper_select') -- WALLPAPER SEL
 qrwidget.night_mode       = require('night_mode')
 qrwidget.notification_bar = require('notifications') -- NOTIFICATION BAR
 qrwidget.notification_bar()
+
+qrwidget.control_panel    = require('modules.widgets.control_panel') -- CONTROL PANEL
 
 -- Wallpaper
 local function set_wallpaper(s)
@@ -334,6 +335,7 @@ awful.screen.connect_for_each_screen(function(s)
         bg       = (beautiful.bar_bg or ((beautiful.bg_normal or '#2E3440') .. 'E0')),
         position = 'top',
         stretch  = true,
+        ontop    = true,
         screen   = s,
         height   = dpi(40)
     })
@@ -352,12 +354,12 @@ awful.screen.connect_for_each_screen(function(s)
         },
         {
 			--myfirstwidget(s),
-            qrwidget.night_mode(s, '#854b11'),
+            --qrwidget.night_mode(s, '#854b11'),
             layout = wibox.layout.fixed.horizontal,
         },
         {
-            qrwidget.music(s),
-            qrwidget.volume(s),
+            --qrwidget.music(s),
+            --qrwidget.volume(s),
             --qrwidget.wallpaper_select(s, {}), -- Disabled for now.
             qrwidget.taglist(s),
             qrwidget.kbdlayout(s),

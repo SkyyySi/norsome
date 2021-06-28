@@ -5,6 +5,7 @@
 local gfs          = require('gears.filesystem')
 local theme_assets = require('beautiful.theme_assets')
 local xresources   = require('beautiful.xresources')
+local shape        = require('gears.shape')
 local dpi          = xresources.apply_dpi
 local themes_path  = gfs.get_themes_dir()
 
@@ -81,6 +82,7 @@ theme.bar_bg = theme.nord0 .. 'E0'
 } --]]
 
 theme.control_panel_bg = theme.nord1 .. 'CC'
+theme.control_panel_toggle_button_icon_bg_shape = shape.squircle
 
 theme.bg_systray           = theme.button_normal or theme.nord1
 theme.systray_icon_spacing = dpi(10)

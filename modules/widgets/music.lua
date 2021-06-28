@@ -297,17 +297,15 @@ function music_button(s)
 								wibox.widget {
 									box_content_text_title,
 									layout        = wibox.container.scroll.horizontal,
-									step_function = wibox.container.scroll.step_functions.linear_increase,
-									speed         = 25,
-									--max_size      = dpi(150),
+									step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
+									speed         = 50,
 									max_size      = text_width,
 								},
 								wibox.widget {
 									box_content_text_artist,
 									layout        = wibox.container.scroll.horizontal,
-									step_function = wibox.container.scroll.step_functions.linear_increase,
-									speed         = 25,
-									--max_size      = dpi(150),
+									step_function = wibox.container.scroll.step_functions.waiting_nonlinear_back_and_forth,
+									speed         = 50,
 									max_size      = text_width,
 								},
 								{

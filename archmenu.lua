@@ -386,6 +386,7 @@
      {"Kupfer", "kupfer ", "/usr/share/icons/hicolor/22x22/apps/kupfer.png" },
      {"Kvantum Manager", "kvantummanager"},
      {"LXQt Archiver", "lxqt-archiver "},
+     {"Latte", "/usr/bin/latte-dock", "/usr/share/icons/hicolor/16x16/apps/latte-dock.svg" },
      {"Laufwerke", "gnome-disks"},
      {"Launchy", "launchy ", "/usr/share/pixmaps/launchy_icon.png" },
      {"MATE-Schriftanzeiger", "mate-font-viewer "},

@@ -335,7 +335,7 @@ awful.screen.connect_for_each_screen(function(s)
         bg       = (beautiful.bar_bg or ((beautiful.bg_normal or '#2E3440') .. 'E0')),
         position = 'top',
         stretch  = true,
-        ontop    = true,
+        ontop    = false,
         screen   = s,
         height   = dpi(40)
     })
@@ -573,79 +573,132 @@ client.connect_signal('request::titlebars', function(c)
         end)
     )
 
-    local top_titlebar = awful.titlebar(c, {
-        size           = beautiful.titlebar_size or dpi(28),
+    c.top_titlebar = awful.titlebar(c, {
+        size           = beautiful.titlebar_size or dpi(28),--beautiful.border_width or dpi(2),--
         enable_tooltip = false,
         position       = 'top',
         bg             = '#00000030', -- transparency; may conflict with transparent titlebars by darkening them, but this makes shadows basically seamless.
     })
 
-    top_titlebar:setup {
+    c.top_titlebar:setup {
         {
             {
                 {
-                    { -- Left
-                        awful.titlebar.widget.iconwidget(c),
-                        awful.titlebar.widget.floatingbutton (c),
-                        awful.titlebar.widget.stickybutton   (c),
-                        awful.titlebar.widget.ontopbutton    (c),
-                        layout  = wibox.layout.fixed.horizontal
-                    },
-                    { -- Middle
-                        { -- Title
-                            align  = 'center',
-                            font   = 'Source Sans Pro bold 12',
-                            widget = awful.titlebar.widget.titlewidget(c)
+                    {
+                        {
+                            { -- Left
+                                wibox.widget.separator { forced_width = dpi(6), orientation = 'horizontal', visible = true, opacity = 0 },
+                                awful.titlebar.widget.iconwidget(c),
+                                awful.titlebar.widget.floatingbutton (c),
+                                awful.titlebar.widget.stickybutton   (c),
+                                awful.titlebar.widget.ontopbutton    (c),
+                                layout  = wibox.layout.fixed.horizontal
+                            },
+                            { -- Middle
+                                { -- Title
+                                    align  = 'center',
+                                    font   = 'Source Sans Pro bold 12',
+                                    widget = awful.titlebar.widget.titlewidget(c)
+                                },
+                                buttons = buttons,
+                                layout  = wibox.layout.flex.horizontal
+                            },
+                            { -- Right
+                                awful.titlebar.widget.minimizebutton (c),
+                                awful.titlebar.widget.maximizedbutton(c),
+                                awful.titlebar.widget.closebutton    (c),
+                                layout = wibox.layout.fixed.horizontal
+                            },
+                            layout = wibox.layout.align.horizontal
                         },
-                        buttons = buttons,
-                        layout  = wibox.layout.flex.horizontal
+                        shape = function(cr, width, height)
+                            gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, (beautiful.titlebar_radius or dpi(20)))
+                        end,
+                        bg = bg_color,
+                        widget = wibox.container.background
                     },
-                    { -- Right
-                        awful.titlebar.widget.minimizebutton (c),
-                        awful.titlebar.widget.maximizedbutton(c),
-                        awful.titlebar.widget.closebutton    (c),
-                        layout = wibox.layout.fixed.horizontal
-                    },
-                    layout = wibox.layout.align.horizontal
-                },
+                    top    = dpi(1),
+                    left   = dpi(1),
+                    right  = dpi(1),
+                    widget = wibox.container.margin
+                }, --]]
                 shape = function(cr, width, height)
                     gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, (beautiful.titlebar_radius or dpi(20)))
                 end,
-                bg = bg_color,
+                bg     = c.border_color,
                 widget = wibox.container.background
             },
-            top    = beautiful.border_width,
-            left   = beautiful.border_width,
-            right  = beautiful.border_width,
+            top    = (beautiful.border_width / 2) or dpi(1),
+            left   = (beautiful.border_width / 2) or dpi(1),
+            right  = (beautiful.border_width / 2) or dpi(1),
             widget = wibox.container.margin
         },
         shape = function(cr, width, height)
             gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, (beautiful.titlebar_radius or dpi(20)))
         end,
-        bg     = c.border_color,
+        bg     = beautiful.border_outer or '#2E3440',
         widget = wibox.container.background
     }
+
     -- These are your "borders"
     local left_titlebar = awful.titlebar(c, {
-        size            = beautiful.border_width,
+        size            = beautiful.border_width or dpi(2),
         enable_tooltip  = false,
         position        = 'left',
         bg              = c.border_color
     })
+    left_titlebar:setup {
+        {
+            {
+                bg     = c.border_color,
+                widget = wibox.container.background
+            },
+            left   = (beautiful.border_width / 2) or dpi(1),
+            widget = wibox.container.margin
+        },
+        bg     = beautiful.border_outer or '#2E3440',
+        widget = wibox.container.background
+    }
 
     local right_titlebar = awful.titlebar(c, {
-        size            = beautiful.border_width,
+        size            = beautiful.border_width or dpi(2),
         enable_tooltip  = false,
         position        = 'right',
         bg              = c.border_color
     })
+    right_titlebar:setup {
+        {
+            {
+                bg     = c.border_color,
+                widget = wibox.container.background
+            },
+            right  = (beautiful.border_width / 2) or dpi(1),
+            widget = wibox.container.margin
+        },
+        bg     = beautiful.border_outer or '#2E3440',
+        widget = wibox.container.background
+    }
 
     local bottom_titlebar = awful.titlebar(c, {
-        size            = beautiful.border_width,
+        size            = beautiful.border_width or dpi(2),
         enable_tooltip  = false,
         position        = 'bottom',
         bg              = c.border_color
     })
+    bottom_titlebar:setup {
+        {
+            {
+                bg     = c.border_color,
+                widget = wibox.container.background
+            },
+            bottom = (beautiful.border_width / 2) or dpi(1),
+            left   = (beautiful.border_width / 2) or dpi(1),
+            right  = (beautiful.border_width / 2) or dpi(1),
+            widget = wibox.container.margin
+        },
+        bg     = beautiful.border_outer or '#2E3440',
+        widget = wibox.container.background
+    }
 
     --[[
     local bottom_titlebar = awful.titlebar(c, {
@@ -717,11 +770,12 @@ screen.connect_signal('arrange', function (s)
     for _, c in pairs(s.clients) do
         if layout == 'floating' or c.floating and not c.maximized then
             -- hide x11 borders and show titlebars
-            awful.titlebar.show(c, 'top')
-            awful.titlebar.show(c, 'right')
-            awful.titlebar.show(c, 'left')
-            awful.titlebar.show(c, 'bottom')
-            c.border_width = 0
+            c.top_titlebar = awful.titlebar(c, {
+                size           = beautiful.titlebar_size or dpi(28),--beautiful.border_width or dpi(2),--
+                enable_tooltip = false,
+                position       = 'top',
+                bg             = '#00000030', -- transparency; may conflict with transparent titlebars by darkening them, but this makes shadows basically seamless.
+            })
 
    		    awful.spawn('xprop -id ' .. c.window .. ' -f _COMPTON_SHADOW 32c -set _COMPTON_SHADOW 1', false)
             c.shape = function(cr, width, height)
@@ -729,11 +783,12 @@ screen.connect_signal('arrange', function (s)
             end
         else
             -- hide titlebars and show x11 borders
-            awful.titlebar.hide(c, 'top')
-            awful.titlebar.hide(c, 'bottom')
-            awful.titlebar.hide(c, 'left')
-            awful.titlebar.hide(c, 'right')
-            c.border_width = beautiful.border_width
+            c.top_titlebar = awful.titlebar(c, {
+                size           = beautiful.border_width or dpi(2),
+                enable_tooltip = false,
+                position       = 'top',
+                bg             = '#00000030', -- transparency; may conflict with transparent titlebars by darkening them, but this makes shadows basically seamless.
+            })
 
     		awful.spawn('xprop -id ' .. c.window .. ' -f _COMPTON_SHADOW 32c -set _COMPTON_SHADOW 0', false)
             c.shape = gears.shape.square
@@ -759,6 +814,7 @@ awful.spawn.with_shell(config_dir .. '/scripts/autostart.sh')
 
 ----------------------------------------------------------------------------------------
 
+--[ [
 client.connect_signal('manage', function(c)
     if not c.floating then
         c.floating_width  = c.width
@@ -769,8 +825,8 @@ client.connect_signal('manage', function(c)
 
     c:connect_signal('property::floating', function()
         if c.floating then
-            c:set_width ( (c.floating_width  or c.width ) - (beautiful.border_width or 0) )
-            c:set_height( (c.floating_height or c.height) - ( (beautiful.titlebar_size or dpi(28)) + (beautiful.border_width or 0) ) )
+            c:set_width ( ((c.floating_width  or c.width ) - (beautiful.border_width or 0)) + dpi(2) )
+            c:set_height( ((c.floating_height or c.height) - ( (beautiful.titlebar_size or dpi(28)) + (beautiful.border_width or 0))) + dpi(4) )
             c:set_x(c.floating_x or c.x)
             c:set_y(c.floating_y or c.y)
         else
@@ -780,7 +836,7 @@ client.connect_signal('manage', function(c)
             c.floating_y      = c.y
         end
     end)
-end)
+end) --]]
 
 --[[
 local testbox = wibox {

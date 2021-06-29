@@ -26,31 +26,32 @@ function control_panel_widget(s)
 	qrwidget.night_mode(s, '#854b11')
 
 	local toggle_button_buttons = wibox.widget {
+		-- Please refer to toggle_button.lua if you want to see the available options.
 		toggle_button {
 			icon          = beautiful.icon.night_mode,
-			--icon_bg_shape = gears.shape.rectangle,
 			title         = 'Night mode',
 			deactivate    = 'always',
 			active        = false,
 			lclick        = function()
 				awesome.emit_signal('qrlinux::util::night_mode')
 			end,
-		}, -- A1
+		},
 		toggle_button {
-			icon = beautiful.icon.web,
-			title = 'Wifi',
-			deactivate = 'signal',
+			icon           = beautiful.icon.web,
+			title          = 'Wifi',
+			deactivate     = 'signal',
 			control_signal = 'qrlinux::wifi::enabled',
-			lclick        = function()
+			lclick         = function()
 				awesome.emit_signal('qrlinux::wifi::toggle')
 			end,
-		}, -- B1
-		toggle_button { icon = beautiful.icon.terminal, lclick = function () awful.spawn(terminal) end, title = 'Terminal' }, -- C1
-		toggle_button { deactivate = 'always' }, -- D1
-		toggle_button { deactivate = 'always' }, -- A2
-		toggle_button { deactivate = 'always' }, -- B2
-		toggle_button { deactivate = 'always' }, -- C2
-		toggle_button { deactivate = 'always' }, -- D2
+		},
+		-- Toggle buttons can also be used as shortcuts, for example like this:
+		--toggle_button {
+		--	icon   = beautiful.icon.terminal,
+		--	lclick = function()
+		--		awful.spawn(terminal or 'xterm')
+		--	end,
+		--},
 		homogeneous     = true,
 		expand          = true,
 		forced_num_cols = 4,
@@ -63,25 +64,36 @@ function control_panel_widget(s)
 			{
 				{
 					{
-						toggle_button_buttons,
-						bottom = dpi(16),
-						widget = wibox.container.margin,
+						{
+							{
+								toggle_button_buttons,
+								bottom = dpi(16),
+								widget = wibox.container.margin,
+							},
+							{
+								s.music_control_widget((s.control_panel.width - dpi(80)), dpi(225)),
+								strategy = 'max',
+								height   = dpi(130),
+								widget   = wibox.container.constraint,
+							},
+							layout = wibox.layout.align.vertical,
+						},
+						margins = dpi(16),
+						widget  = wibox.container.margin,
 					},
-					{
-						s.music_control_widget((s.control_panel.width - dpi(80)), dpi(225)),
-						strategy = 'max',
-						height   = dpi(130),
-						widget   = wibox.container.constraint,
-					},
-					layout = wibox.layout.align.vertical,
+					bg                 = beautiful.control_panel_container_bg or beautiful.nord0 or '#2E3440',
+					shape              = beautiful.control_panel_container_shape or rounded_rectangle(dpi(20)),
+					shape_border_width = beautiful.control_panel_container_shape_width or dpi(1),
+					shape_border_color = beautiful.control_panel_container_shape_color or beautiful.nord4 or '#D8DEE9',
+					widget             = wibox.container.background,
 				},
-				margins = dpi(16),
+				margins = dpi(1),
 				widget  = wibox.container.margin,
 			},
-			bg                 = beautiful.control_panel_container_bg or beautiful.nord0 or '#2E3440',
+			bg                 = beautiful.control_panel_container_shape_color or beautiful.nord4 or '#D8DEE9',
 			shape              = beautiful.control_panel_container_shape or rounded_rectangle(dpi(20)),
 			shape_border_width = beautiful.control_panel_container_shape_width or dpi(1),
-			shape_border_color = beautiful.control_panel_container_shape_color or beautiful.nord4 or '#D8DEE9',
+			shape_border_color = beautiful.control_panel_container_shape_color_outer or beautiful.nord0 or '#2E3440',
 			widget             = wibox.container.background,
 		},
 		top    = dpi(16),
@@ -163,12 +175,18 @@ function control_panel_widget(s)
 			{
 				{
 					{
-						s.control_panel.widget.volume_slider(),
-						layout = wibox.layout.fixed.horizontal,
+						{
+							s.control_panel.widget.volume_slider(),
+							layout = wibox.layout.fixed.horizontal,
+						},
+						margins = dpi(1),
+						widget  = wibox.container.margin,
 					},
-					bg     = beautiful.nord2,
-					widget = wibox.container.background,
-					layout = wibox.layout.fixed.vertical,
+					bg                 = beautiful.nord0,
+					shape              = rounded_rectangle(dpi(21)),
+					shape_border_width = dpi(1),
+					shape_border_color = beautiful.nord0,
+					widget             = wibox.container.background,
 				},
 				top    = dpi(16),
 				left   = dpi(16),
@@ -182,15 +200,26 @@ function control_panel_widget(s)
 			{
 				{
 					{
-						widget = notification_container,
+						{
+							{
+								widget = notification_container,
+							},
+							margins = dpi(16),
+							widget  = wibox.container.margin,
+						},
+						bg                 = beautiful.nord0,
+						shape              = rounded_rectangle(dpi(20)),
+						shape_border_width = dpi(1),
+						shape_border_color = beautiful.nord4,
+						widget             = wibox.container.background,
 					},
-					margins = dpi(16),
+					margins = dpi(1),
 					widget  = wibox.container.margin,
 				},
-				bg                 = beautiful.nord0,
-				shape              = rounded_rectangle(dpi(20)),
-				shape_border_width = dpi(1),
-				shape_border_color = beautiful.nord4,
+				bg                 = beautiful.control_panel_container_shape_color or beautiful.nord4 or '#D8DEE9',
+				shape              = beautiful.control_panel_container_shape or rounded_rectangle(dpi(20)),
+				shape_border_width = beautiful.control_panel_container_shape_width or dpi(1),
+				shape_border_color = beautiful.control_panel_container_shape_color_outer or beautiful.nord0 or '#2E3440',
 				widget             = wibox.container.background,
 			},
 			margins = dpi(16),

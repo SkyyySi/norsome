@@ -52,6 +52,7 @@ theme.border_width       = dpi(2)
 theme.border_normal      = theme.nord3
 theme.border_focus       = theme.nord4
 theme.border_marked      = theme.nord4
+theme.border_outer       = theme.nord0
 
 theme.button_normal       = theme.nord1        -- default
 theme.button_enter        = theme.nord2        -- hovered

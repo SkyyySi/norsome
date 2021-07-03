@@ -7,13 +7,15 @@ CONFIG_PREFIX="${XDG_CONFIG_DIR:-${HOME}/.config}/awesome/other"
 # These cannot be checked with pgrep for some reason
 lxqt-policykit-agent&
 lxqt-powermanagement&
+playerctld daemon&
 
 run=(
+	'nm-applet'
 	'blueman-applet'
 	'lxqt-session -w awesome'
-#	'pasystray'
+	'pasystray'
 	"picom --config ${CONFIG_PREFIX}/picom/picom.conf"
-	'playerctld daemon'
+#	'playerctld daemon'
 #	'timidity -iA'
 #	'ulauncher'
 	'unclutter -b'

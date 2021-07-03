@@ -2,17 +2,15 @@
 -- Nordic awesome theme --
 --------------------------
 
-local gfs          = require('gears.filesystem')
+--local gfs          = require('gears.filesystem')
 local theme_assets = require('beautiful.theme_assets')
 local xresources   = require('beautiful.xresources')
-local shape        = require('gears.shape')
+local shape        = gears.shape or require('gears.shape')
 local dpi          = xresources.apply_dpi
-local themes_path  = gfs.get_themes_dir()
+--local themes_path  = gears.filesystem.get_themes_dir()
 
 local theme = {}
--- The names are actually nord0, nord1, ..., nord15, but lua does
--- not allow for variable names to start with numbers. Thus, letters
--- are used here instead.
+-- The nord color palete is pre-defined here so I don't have to keep looking them up ;)
 theme.nord0  = '#2E3440' -- Polar Night 1
 theme.nord1  = '#3B4252' -- Polar Night 2
 theme.nord2  = '#434C5E' -- Polar Night 3
@@ -30,18 +28,25 @@ theme.nord13 = '#EBCB8B' -- Aurora 3
 theme.nord14 = '#A3BE8C' -- Aurora 4
 theme.nord15 = '#B48EAD' -- Aurora 5
 
-theme.font           = 'Source Sans Pro 11'
+theme.font_family           = 'Source Sans Pro'
+theme.font_bold             = (theme.font_family .. ', Bold')
+theme.font_italic           = (theme.font_family .. ', Italic')
+theme.font_bolditalic       = (theme.font_family .. ', Bold Italic')
+theme.font_size             = 11
+theme.font                  = (theme.font_family .. ' ' .. tostring(theme.font_size))
+theme.font_family_monospace = 'Source Code Pro'
+theme.font_monospace        = (theme.font_family_monospace .. tostring(theme.font_monospace_size or theme.font_size))
 
-theme.bg_normal      = theme.nord0
-theme.bg_focus       = theme.nord10
-theme.bg_urgent      = theme.nord12
-theme.bg_minimize    = theme.nord1
-theme.bg_systray     = theme.bg_normal
+theme.bg_normal   = theme.nord0
+theme.bg_focus    = theme.nord10
+theme.bg_urgent   = theme.nord12
+theme.bg_minimize = theme.nord1
+theme.bg_systray  = theme.bg_normal
 
-theme.fg_normal      = theme.nord4
-theme.fg_focus       = theme.nord4
-theme.fg_urgent      = theme.nord0
-theme.fg_minimize    = theme.nord4
+theme.fg_normal   = theme.nord4
+theme.fg_focus    = theme.nord4
+theme.fg_urgent   = theme.nord0
+theme.fg_minimize = theme.nord4
 
 -- Titlebars and borders
 theme.titlebar_bg_normal = theme.nord1 or '#353C4A'
@@ -82,7 +87,13 @@ theme.bar_bg = theme.nord0 .. 'E0'
     stops = { { 0, theme.nord0 }, { 1, theme.nord3 } }
 } --]]
 
+theme.qrwidget_bg                 = theme.nord0
+theme.qrwidget_shape              = function(cr,w,h) shape.rounded_rect(cr,w,h,dpi(20)) end
+theme.qrwidget_shape_border_width = dpi(1)
+theme.qrwidget_shape_border_color = theme.nord4
+
 theme.control_panel_bg = theme.nord1 .. 'CC'
+theme.control_panel_fg = theme.nord4
 theme.control_panel_toggle_button_icon_bg_shape = shape.squircle
 
 theme.bg_systray           = theme.button_normal or theme.nord1
@@ -116,19 +127,51 @@ theme.taglist_squares_unsel = theme_assets.taglist_squares_unsel(
 -- notification_[bg|fg]
 -- notification_[width|height|margin]
 -- notification_[border_color|border_width|shape|opacity]
+theme.notification_bg = theme.nord3
+theme.notification_shape = shape.rounded_rect
 
 -- Variables set for theming the menu:
 -- menu_[bg|fg]_[normal|focus]
 -- menu_[border_color|border_width]
---theme.menu_submenu_icon = theme_dir .. 'submenu.png'
-theme.menu_border_color = theme.fg_normal
-theme.menu_height = dpi(30)
-theme.menu_width  = dpi(175)
+theme.menu_submenu_icon = nil--theme_dir .. 'submenu.png'
+theme.menu_font         = theme.font
+theme.menu_height       = dpi(30)
+theme.menu_width        = dpi(175)
+theme.menu_border_width = dpi(1)
+theme.menu_border_color = theme.nord4
+theme.menu_fg_normal    = theme.nord4
+theme.menu_bg_normal    = theme.nord0
+theme.menu_fg_focus     = theme.nord0
+theme.menu_bg_focus     = gears.color {
+	type  = 'linear',
+	from  = { 0, 0 },
+	to    = { (theme.menu_width or dpi(175)), 0 },
+	stops = { { 0, theme.nord9 }, { 0.5, theme.nord8 }, { 1, theme.nord7 } }
+}
 
 -- You can add as many variables as
 -- you wish and access them by using
 -- beautiful.variable in your rc.lua
 --theme.bg_widget = '#cc0000'
+
+--[[
+theme.titlebar_close_button = wibox.widget {
+    {
+        {
+            text   = 'X',
+            align  = 'center',
+            valign = 'center',
+            widget = wibox.widget.textbox,
+        },
+        bg                 = theme.nord11,
+        shape              = shape.circle,
+        shape_border_width = dpi(1),
+        shape_border_color = theme.nord1,
+        widget             = wibox.container.background,
+    },
+    margins = dpi(2),
+    widget  = wibox.container.margin,
+} --]]
 
 -- Define the image to load
 theme.titlebar_close_button_normal = theme_dir .. 'titlebar/close_normal.png'
@@ -197,7 +240,7 @@ theme.icon.night_mode = theme_dir .. 'qrlinux/moon.svg'
 
 -- Define the icon theme for application icons. If not set then the icons
 -- from /usr/share/icons and /usr/share/icons/hicolor will be used.
-theme.icon_theme = nil
+theme.icon_theme = 'Papirus-Dark-nordic-blue-folders'
 
 return(theme)
 

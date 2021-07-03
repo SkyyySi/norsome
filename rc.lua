@@ -17,7 +17,6 @@ menubar       = require('menubar')
 hotkeys_popup = require('awful.hotkeys_popup')
 xresources    = require('beautiful.xresources')
 dpi           = xresources.apply_dpi
-xdg_menu      = require('archmenu')
 
 -- Add the local module and widget directory to awesome's path
 package.path = package.path .. ';' .. awful.util.getdir('config') .. 'modules/?.lua'
@@ -35,6 +34,9 @@ require('awful.hotkeys_popup.keys')
 -- Error handling
 require('error-handler')
 
+-- Early auto start for daemon processes
+awful.spawn.with_shell('playerctl daemon')
+
 -- {{{ Variable definitions
 theme       = 'nord'
 terminal    = 'alacritty'
@@ -45,21 +47,20 @@ editor_cmd  = editor
 config_dir  = awful.util.getdir('config')
 themes_dir  = config_dir .. 'themes/'
 theme_dir   = themes_dir .. theme .. '/'
-local night_mode = true
 
 -- Themes define colours, icons, font and wallpapers.
 beautiful.init(theme_dir .. 'theme.lua')
 
 if ( terminal == 'alacritty' and filecheck.read(theme_dir .. 'alacritty.yml') ) then
-    local term_themed = 'sh -c "alacritty -o \\"$(/usr/bin/env cat ' .. theme_dir .. 'alacritty.yml' .. ')\\""'
-    terminal          = term_themed
+	local term_themed = 'sh -c "alacritty -o \\"$(/usr/bin/env cat ' .. theme_dir .. 'alacritty.yml' .. ')\\""'
+	terminal          = term_themed
 end
 
 -- Load bling for extra stuff
 bling = require('bling')
 bling.signal.playerctl.enable()
 if filecheck.read(os.getenv('HOME') .. '/.cache/awesome/cover.png') then
-    awful.spawn({'rm', '-f', (os.getenv('HOME') .. '/.cache/awesome/cover.png')})
+	awful.spawn({'rm', '-f', (os.getenv('HOME') .. '/.cache/awesome/cover.png')})
 end
 
 -- Default modkey.
@@ -72,79 +73,49 @@ modkey = 'Mod4'
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
-    awful.layout.suit.spiral,
-    awful.layout.suit.floating,
-    --awful.layout.suit.max,
+	awful.layout.suit.spiral,
+	awful.layout.suit.floating,
+	--awful.layout.suit.max,
 --[[ Full list:
-    awful.layout.suit.floating,
-    awful.layout.suit.tile,
-    awful.layout.suit.tile.left,
-    awful.layout.suit.tile.bottom,
-    awful.layout.suit.tile.top,
-    awful.layout.suit.fair,
-    awful.layout.suit.fair.horizontal,
-    awful.layout.suit.spiral,
-    awful.layout.suit.spiral.dwindle,
-    awful.layout.suit.max,
-    awful.layout.suit.max.fullscreen,
-    awful.layout.suit.magnifier,
-    awful.layout.suit.corner.nw,
-    awful.layout.suit.corner.ne,
-    awful.layout.suit.corner.sw,
-    awful.layout.suit.corner.se,
+	awful.layout.suit.floating,
+	awful.layout.suit.tile,
+	awful.layout.suit.tile.left,
+	awful.layout.suit.tile.bottom,
+	awful.layout.suit.tile.top,
+	awful.layout.suit.fair,
+	awful.layout.suit.fair.horizontal,
+	awful.layout.suit.spiral,
+	awful.layout.suit.spiral.dwindle,
+	awful.layout.suit.max,
+	awful.layout.suit.max.fullscreen,
+	awful.layout.suit.magnifier,
+	awful.layout.suit.corner.nw,
+	awful.layout.suit.corner.ne,
+	awful.layout.suit.corner.sw,
+	awful.layout.suit.corner.se,
 ]]--
 }
 -- }}}
 
 -- {{{ Menu
--- Generate an xdg app menu
-awful.spawn.with_shell('xdg_menu --format awesome --root-menu /etc/xdg/menus/arch-applications.menu > ' .. config_dir .. '/archmenu.lua')
-
--- Create a launcher widget and a main menu
-local menu_awesome = {
-    { 'Show hotkeys', function() hotkeys_popup.show_help(nil, awful.screen.focused()) end },
-    { 'Show manual', terminal .. ' -e man awesome' },
---    { 'Edit config', editor_cmd .. ' ' .. awesome.conffile },
-    { 'Edit config', editor_cmd .. ' ' .. config_dir },
-    { 'Restart awesome', awesome.restart },
-    { 'Quit awesome', function() awesome.quit() end },
-}
-
-local menu_power = {
-    { 'Lock session', 'loginctl lock-session' },
-    { 'Shutdown',     'sudo poweroff'         },
-    { 'Reboot',       'sudo reboot'           },
-    { 'Suspend',      'systemctl suspend'     },
-    { 'Hibernate',    'systemctl hibernate'   },
-}
-
-awesome_menu = awful.menu {
-    items = {
-        { 'Awesome',      menu_awesome, beautiful.awesome_icon  },
-        { 'Power',        menu_power,   beautiful.icon.power    },
-        { 'Applications', xdgmenu,      beautiful.icon.app      },
-        { '––––––––––––––––––––'                                },
-        { 'Terminal',     terminal,     beautiful.icon.terminal },
-        { 'File manager', filemanager,  beautiful.icon.folder   },
-        { 'Web browser',  webbrowser,   beautiful.icon.web      },
-    },
-    shape = gears.shape.rounded_rect
-}
+awesome_menu = require('widgets.awesome_menu')
 
 --- EXTERNAL FILES ---
-local qrlinux  = {}
-qrlinux.widget = {}
+--local qrlinux  = {}
+--qrlinux.widget = {}
 
 -- Signals
 require('signals.get_volume')
 require('signals.get_song')
 
 -- Modules
-local rounded_rectangle = require('rounded_rectangle')
-local infobubble        = require('infobubble')
-local rounded_wibox     = require('rounded_wibox')
-local buttonify         = require('buttonify')
-local hsl               = require('hsl')
+rounded_rectangle    = require('rounded_rectangle')
+infobubble           = require('infobubble')
+rounded_wibox        = require('rounded_wibox')
+buttonify            = require('buttonify')
+hsl                  = require('hsl')
+double_border_widget = require('double_border_widget')
+make_widget          = require('make_widget')
 
 -- Widgets
 --local menubutton        = require('widgets.menubutton')
@@ -179,8 +150,8 @@ qrwidget.control_panel    = require('modules.widgets.control_panel') -- CONTROL 
 
 -- Wallpaper
 local function set_wallpaper(s)
-    awful.spawn('nitrogen --restore')
-    --awful.spawn('hsetroot -add '#2e3440' -add '#eceff4' -gradient 180')
+	awful.spawn('nitrogen --restore')
+	--awful.spawn('hsetroot -add '#2e3440' -add '#eceff4' -gradient 180')
 end
 
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
@@ -233,143 +204,82 @@ function myfirstwidget(s)
 end ]]
 
 awful.screen.connect_for_each_screen(function(s)
-    -- Wallpaper
-    set_wallpaper(s)
+	-- Wallpaper
+	set_wallpaper(s)
 
-    -- Each screen has its own tag table.
-    awful.tag({ '1', '2', '3', '4', '5', '6', '7', '8', '9', }, s, awful.layout.layouts[1])
+	-- Each screen has its own tag table.
+	awful.tag({ '1', '2', '3', '4', '5', '6', '7', '8', '9', }, s, awful.layout.layouts[1])
 
-    -- Create a promptbox for each screen
-    s.promptbox = awful.widget.prompt()
+	-- Create a promptbox for each screen
+	s.promptbox = awful.widget.prompt()
 
-    --[[ if night_mode then
-        s.night_mode = require('night_mode')
-        local night_mode_button_wibox = wibox {
-            screen  = s,
-            type    = 'utility',
-            width   = 100,
-            height  = 60,
-            opacity = 1,
-            ontop   = true,
-            visible = true,
-        }
+	--[[ s.desktop_volslide  = make_widget {
+		widget = require('widgets.control_panel.widgets.volume'),
+		mode   = 'desktop',
+		screen = s,
+		--shape  = rounded_rectangle(dpi(5)),
+		width  = dpi(350),
+		height = dpi(60),
+		desktop_margins = {
+			right  = dpi(40),
+			bottom = dpi(320),
+		}
+	} ]]
 
-        local night_mode_button = wibox.widget {
-            {
-                {
-                    {
-                        widget = wibox.widget.textbox,
-                        text   = 'Night mode!',
-                    },
-                    widget  = wibox.container.margin,
-                    margins = dpi(4),
-                },
-                widget             = wibox.container.background,
-                bg                 = beautiful.button_normal,
-                shape              = gears.shape.rounded_bar,
-                shape_border_width = 2,
-                shape_border_color = beautiful.nord12,
-            },
-            widget  = wibox.container.margin,
-            margins = dpi(4),
-        }
-        buttonify({ widget = night_mode_button.widget })
+	--[[ s.desktop_calendar  = make_widget {
+		widget          = require('widgets.control_panel.widgets.calendar'),
+		mode            = 'desktop',
+		screen          = s,
+		--shape           = rounded_rectangle(dpi(5)),
+		width           = dpi(192),
+		height          = dpi(230),
+		placement       = 'bottom_right',
+		desktop_margins = {
+			bottom = dpi(40),
+			right  = dpi(40),
+		}
+	} ]]
 
-        night_mode_button_wibox:setup {
-            night_mode_button,
-            layout = wibox.layout.align.horizontal
-        }
+	-- Create the top wibar
+	s.topwibar   = awful.wibar({
+		bg       = (beautiful.bar_bg or ((beautiful.bg_normal or '#2E3440') .. 'E0')),
+		position = 'top',
+		stretch  = true,
+		ontop    = false,
+		screen   = s,
+		height   = dpi(40)
+	})
 
-        s.night_mode_overlay = wibox {
-            screen            = s,
-            width             = 1920,
-            height            = 1080,
-            type              = 'utility',
-            bg                = '#632b00',
-            opacity           = 0.0,
-            input_passthrough = true,
-            ontop             = true,
-            visible           = true,
-        }
-        s.night_mode_overlay_enabled = false
-        s.night_mode_overlay_timer = nil
-
-        function s.night_mode_overlay_fade(t)
-            s.night_mode_overlay_enabled = t
-            if (s.night_mode_overlay_timer) then s.night_mode_overlay_timer:stop() end
-            if (t == true) then
-                s.night_mode_overlay_timer = gears.timer {
-                    timeout = 0.05,
-                    call_now = true,
-                    autostart = true,
-                    callback = function()
-                        if (s.night_mode_overlay.opacity < 0.5) then
-                            s.night_mode_overlay.opacity = (s.night_mode_overlay.opacity + 0.01)
-                        end
-                    end
-                }
-            elseif (t == false) then
-                s.night_mode_overlay_timer = gears.timer {
-                    timeout = 0.05,
-                    call_now = true,
-                    autostart = true,
-                    callback = function()
-                        if (s.night_mode_overlay.opacity > 0) then
-                            s.night_mode_overlay.opacity = (s.night_mode_overlay.opacity - 0.01)
-                        end
-                    end
-                }
-        end
-        gears.timer {
-                timeout = 1,
-                call_now = true,
-                autostart = true,
-                callback = function()
-                    naughty.notify {text=tostring(s.night_mode_overlay_enabled)}
-                end
-        }
-    end ]]
-
-    -- Create the top wibar
-    s.topwibar   = awful.wibar({
-        bg       = (beautiful.bar_bg or ((beautiful.bg_normal or '#2E3440') .. 'E0')),
-        position = 'top',
-        stretch  = true,
-        ontop    = false,
-        screen   = s,
-        height   = dpi(40)
-    })
-
-    -- Add widgets to the top wibar
-    s.topwibar:setup {
-        direction = 'east',
-        layout    = wibox.layout.align.horizontal,
-        {
-            qrwidget.menubutton(s),
-            qrwidget.tasklist(s),
-            s.promptbox,
-            margins = dpi(4),
-            widget  = wibox.container.margin,
-            layout  = wibox.layout.align.horizontal,
-        },
-        {
-			--myfirstwidget(s),
-            --qrwidget.night_mode(s, '#854b11'),
-            layout = wibox.layout.fixed.horizontal,
-        },
-        {
-            --qrwidget.music(s),
-            --qrwidget.volume(s),
-            --qrwidget.wallpaper_select(s, {}), -- Disabled for now.
-            qrwidget.taglist(s),
-            qrwidget.kbdlayout(s),
-            qrwidget.calendar(s),
-            qrwidget.systray(screen.primary),
-            qrwidget.control_panel(s),
-            qrwidget.current_layout(s),
-            layout = wibox.layout.fixed.horizontal,
-        },
-    }
+	-- Add widgets to the top wibar
+	s.topwibar:setup {
+		{ -- Right
+			qrwidget.menubutton(s),
+			qrwidget.taglist(s),
+			awful.widget.prompt(),
+			margins = dpi(4),
+			widget  = wibox.container.margin,
+			layout  = wibox.layout.align.horizontal,
+		},
+		{ -- Center
+			nil,
+			qrwidget.tasklist(s),
+			nil,
+			expand = 'outside',
+			layout = wibox.layout.align.horizontal,
+		},
+		{ -- Left
+			--qrwidget.music(s),
+			qrwidget.volume(s),
+			--qrwidget.wallpaper_select(s, {}), -- Disabled for now.
+			qrwidget.kbdlayout(s),
+			qrwidget.calendar(s),
+			qrwidget.systray(screen.primary),
+			qrwidget.control_panel(s),
+			qrwidget.current_layout(s),
+			layout = wibox.layout.fixed.horizontal,
+		},
+		layout    = wibox.layout.align.horizontal,
+	}
 end)
 -- }}}
 
@@ -386,50 +296,50 @@ local clientkeys    = require('modules.bindings.keyboard.clientkeys')
 -- Be careful: we use keycodes to make it work on any keyboard layout.
 -- This should map on the top row of your keyboard, usually 1 to 9.
 for i = 1, 9 do
-    globalkeys = gears.table.join(globalkeys,
-        -- View tag only.
-        awful.key({ modkey }, '#' .. i + 9,
-                  function ()
-                        local screen = awful.screen.focused()
-                        local tag = screen.tags[i]
-                        if tag then
-                           tag:view_only()
-                        end
-                  end,
-                  {description = 'view tag #'..i, group = 'tag'}),
-        -- Toggle tag display.
-        awful.key({ modkey, 'Control' }, '#' .. i + 9,
-                  function ()
-                      local screen = awful.screen.focused()
-                      local tag = screen.tags[i]
-                      if tag then
-                         awful.tag.viewtoggle(tag)
-                      end
-                  end,
-                  {description = 'toggle tag #' .. i, group = 'tag'}),
-        -- Move client to tag.
-        awful.key({ modkey, 'Shift' }, '#' .. i + 9,
-                  function ()
-                      if client.focus then
-                          local tag = client.focus.screen.tags[i]
-                          if tag then
-                              client.focus:move_to_tag(tag)
-                          end
-                     end
-                  end,
-                  {description = 'move focused client to tag #'..i, group = 'tag'}),
-        -- Toggle tag on focused client.
-        awful.key({ modkey, 'Control', 'Shift' }, '#' .. i + 9,
-                  function ()
-                      if client.focus then
-                          local tag = client.focus.screen.tags[i]
-                          if tag then
-                              client.focus:toggle_tag(tag)
-                          end
-                      end
-                  end,
-                  {description = 'toggle focused client on tag #' .. i, group = 'tag'})
-    )
+	globalkeys = gears.table.join(globalkeys,
+		-- View tag only.
+		awful.key({ modkey }, '#' .. i + 9,
+				  function ()
+						local screen = awful.screen.focused()
+						local tag = screen.tags[i]
+						if tag then
+						   tag:view_only()
+						end
+				  end,
+				  {description = 'view tag #'..i, group = 'tag'}),
+		-- Toggle tag display.
+		awful.key({ modkey, 'Control' }, '#' .. i + 9,
+				  function ()
+					  local screen = awful.screen.focused()
+					  local tag = screen.tags[i]
+					  if tag then
+						 awful.tag.viewtoggle(tag)
+					  end
+				  end,
+				  {description = 'toggle tag #' .. i, group = 'tag'}),
+		-- Move client to tag.
+		awful.key({ modkey, 'Shift' }, '#' .. i + 9,
+				  function ()
+					  if client.focus then
+						  local tag = client.focus.screen.tags[i]
+						  if tag then
+							  client.focus:move_to_tag(tag)
+						  end
+					 end
+				  end,
+				  {description = 'move focused client to tag #'..i, group = 'tag'}),
+		-- Toggle tag on focused client.
+		awful.key({ modkey, 'Control', 'Shift' }, '#' .. i + 9,
+				  function ()
+					  if client.focus then
+						  local tag = client.focus.screen.tags[i]
+						  if tag then
+							  client.focus:toggle_tag(tag)
+						  end
+					  end
+				  end,
+				  {description = 'toggle focused client on tag #' .. i, group = 'tag'})
+	)
 end
 
 -- Set keys
@@ -439,316 +349,331 @@ root.keys(globalkeys)
 -- {{{ Rules
 -- Rules to apply to new clients (through the 'manage' signal).
 awful.rules.rules = {
-    -- All clients will match this rule.
-    { rule = { },
-      properties = { border_width = 0,
-                     border_color = beautiful.border_normal,
-                     focus = awful.client.focus.filter,
-                     raise = true,
-                     keys = clientkeys,
-                     buttons = clientbuttons,
-                     screen = awful.screen.preferred,
-                     placement = awful.placement.no_overlap+awful.placement.no_offscreen
-     }
-    },
+	-- All clients will match this rule.
+	{ rule = { },
+	  properties = { border_width = 0,
+					 border_color = beautiful.border_normal,
+					 focus = awful.client.focus.filter,
+					 raise = true,
+					 keys = clientkeys,
+					 buttons = clientbuttons,
+					 screen = awful.screen.preferred,
+					 placement = awful.placement.no_overlap+awful.placement.no_offscreen
+	 }
+	},
 
-    -- Floating clients.
-    { rule_any = {
-        instance = {
-          'DTA',  -- Firefox addon DownThemAll.
-          'copyq',  -- Includes session name in class.
-          'pinentry',
-        },
-        class = {
-            'Arandr',
-            'Blueman-manager',
-            'Gcr-prompter',
-            'Gpick',
-            'Kruler',
-            'MessageWin',  -- kalarm.
-            'Sxiv',
-            'Tor Browser', -- Needs a fixed window size to avoid fingerprinting by screen size.
-            'Wpa_gui',
-            'veromix',
-            'xtightvncviewer',
-            'Wrapper-2.0',
-            'Audacity',
-            'lxqt-config',
-            'lxqt-admin-user',
-            'Kvantum Manager',
-            'System-config-printer.py',
-            'org.kde.fancontrol.gui',
-            'partitionmanager',
-            'sddm-config-editor',
-        },
+	-- Floating clients.
+	{ rule_any = {
+		instance = {
+		  'DTA',  -- Firefox addon DownThemAll.
+		  'copyq',  -- Includes session name in class.
+		  'pinentry',
+		},
+		class = {
+			'Arandr',
+			'Blueman-manager',
+			'Gcr-prompter',
+			'Gpick',
+			'Kruler',
+			'MessageWin',  -- kalarm.
+			'Sxiv',
+			'Tor Browser', -- Needs a fixed window size to avoid fingerprinting by screen size.
+			'Wpa_gui',
+			'veromix',
+			'xtightvncviewer',
+			'Wrapper-2.0',
+			'Audacity',
+			'lxqt-config',
+			'lxqt-admin-user',
+			'Kvantum Manager',
+			'System-config-printer.py',
+			'org.kde.fancontrol.gui',
+			'partitionmanager',
+			'sddm-config-editor',
+		},
 
-        -- Note that the name property shown in xprop might be set slightly after creation of the client
-        -- and the name shown there might not match defined rules here.
-        name = {
-          'Event Tester',  -- xev.
-        },
-        role = {
-          'AlarmWindow',  -- Thunderbird's calendar.
-          'ConfigManager',  -- Thunderbird's about:config.
-          'pop-up',       -- e.g. Google Chrome's (detached) Developer Tools.
-        }
-      }, properties = { floating = true }},
+		-- Note that the name property shown in xprop might be set slightly after creation of the client
+		-- and the name shown there might not match defined rules here.
+		name = {
+		  'Event Tester',  -- xev.
+		},
+		role = {
+		  'AlarmWindow',  -- Thunderbird's calendar.
+		  'ConfigManager',  -- Thunderbird's about:config.
+		  'pop-up',       -- e.g. Google Chrome's (detached) Developer Tools.
+		}
+	  }, properties = { floating = true }},
 
 --    -- Add titlebars to normal clients and dialogs
 --    { rule_any = { type = { 'normal', 'dialog' }
 --      }, properties = { titlebars_enabled = true }
 --    },
 
-    -- Hide titlebars and borders from bars and launchers
-    {
-        rule_any = {
-            class = {
-                'Wrapper-2.0',
-                'Ulauncher',
-                'Xfce4-panel',
-            }
-        },
-        properties = {
-            floating          = true,
-            titlebars_enabled = false,
-            border_width      = 0
-        }
-    },
+	-- Hide titlebars and borders from bars and launchers
+	{
+		rule_any = {
+			class = {
+				'Wrapper-2.0',
+				'Ulauncher',
+				'Xfce4-panel',
+			}
+		},
+		properties = {
+			floating          = true,
+			titlebars_enabled = false,
+			border_width      = 0
+		}
+	},
 
-    { rule = { class = 'krunner' },
-        properties = {
-            floating          = true,
-            titlebars_enabled = false,
-            border_width      = 0
-        }
-    },
+	{ rule = { class = { 'krunner', 'Plank' } },
+		properties = {
+			floating          = true,
+			titlebars_enabled = false,
+			borderless        = true,
+			border_width      = 0,
+		}
+	},
 
-    -- "Fix" a wierd bug where Firefox doesn't want to tile
-    { rule = { class = 'firefox' },
-      properties = { opacity = 1, maximized = false, floating = false }
-    },
+	-- "Fix" a wierd bug where Firefox doesn't want to tile
+	{ rule = { class = 'firefox' },
+	  properties = { opacity = 1, maximized = false, floating = false }
+	},
 
-    { rule = { class = 'portal2_linux' },
-      properties = { opacity = 1, maximized = false, floating = true, titlebars_enabled = false }
-    },
+	{ rule = { class = 'portal2_linux' },
+	  properties = { opacity = 1, maximized = false, floating = true, titlebars_enabled = false }
+	},
 
-    { rule = { class = 'Gnome-flashback' },
-      properties = { sticky = true, border_width = 0 }
-    },
+	{ rule = { class = 'Gnome-flashback' },
+	  properties = { sticky = true, border_width = 0 }
+	},
 }
 -- }}}
 
 -- {{{ Signals
 -- Signal function to execute when a new client appears.
 client.connect_signal('manage', function (c)
-    -- Set the windows at the slave,
-    -- i.e. put it at the end of others instead of setting it master.
-    -- if not awesome.startup then awful.client.setslave(c) end
+	-- Set the windows at the slave,
+	-- i.e. put it at the end of others instead of setting it master.
+	-- if not awesome.startup then awful.client.setslave(c) end
 
-    if awesome.startup
-      and not c.size_hints.user_position
-      and not c.size_hints.program_position then
-        -- Prevent clients from being unreachable after screen count changes.
-        awful.placement.no_offscreen(c)
-    end
+	if awesome.startup
+	  and not c.size_hints.user_position
+	  and not c.size_hints.program_position then
+		-- Prevent clients from being unreachable after screen count changes.
+		awful.placement.no_offscreen(c)
+	end
 end)
 
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
 client.connect_signal('request::titlebars', function(c)
-    local bg_color = beautiful.bg_normal
+	local bg_color = beautiful.bg_normal
 
-    if c == client.focus then
-        bg_color = beautiful.bg_focus
-    end
+	if c == client.focus then
+		bg_color = beautiful.bg_focus
+	end
 
-    -- buttons for the titlebar
-    local buttons = gears.table.join(
-        awful.button({ }, 1, function()
-            c:emit_signal('request::activate', 'titlebar', {raise = true})
-            awful.mouse.client.move(c)
-        end),
-        awful.button({ }, 3, function()
-            c:emit_signal('request::activate', 'titlebar', {raise = true})
-            awful.mouse.client.resize(c)
-        end)
-    )
+	-- buttons for the titlebar
+	local buttons = gears.table.join(
+		awful.button({ }, 1, function()
+			c:emit_signal('request::activate', 'titlebar', {raise = true})
+			awful.mouse.client.move(c)
+		end),
+		awful.button({ }, 3, function()
+			c:emit_signal('request::activate', 'titlebar', {raise = true})
+			awful.mouse.client.resize(c)
+		end)
+	)
 
-    c.top_titlebar = awful.titlebar(c, {
-        size           = beautiful.titlebar_size or dpi(28),--beautiful.border_width or dpi(2),--
-        enable_tooltip = false,
-        position       = 'top',
-        bg             = '#00000030', -- transparency; may conflict with transparent titlebars by darkening them, but this makes shadows basically seamless.
-    })
+	c.top_titlebar = awful.titlebar(c, {
+		size           = (beautiful.titlebar_size or dpi(28)) + (beautiful.border_width or dpi(2)),
+		enable_tooltip = false,
+		position       = 'top',
+		bg             = '#00000030', -- transparency; may conflict with transparent titlebars by darkening them, but this makes shadows basically seamless.
+	})
 
-    c.top_titlebar:setup {
-        {
-            {
-                {
-                    {
-                        {
-                            { -- Left
-                                wibox.widget.separator { forced_width = dpi(6), orientation = 'horizontal', visible = true, opacity = 0 },
-                                awful.titlebar.widget.iconwidget(c),
-                                awful.titlebar.widget.floatingbutton (c),
-                                awful.titlebar.widget.stickybutton   (c),
-                                awful.titlebar.widget.ontopbutton    (c),
-                                layout  = wibox.layout.fixed.horizontal
-                            },
-                            { -- Middle
-                                { -- Title
-                                    align  = 'center',
-                                    font   = 'Source Sans Pro bold 12',
-                                    widget = awful.titlebar.widget.titlewidget(c)
-                                },
-                                buttons = buttons,
-                                layout  = wibox.layout.flex.horizontal
-                            },
-                            { -- Right
-                                awful.titlebar.widget.minimizebutton (c),
-                                awful.titlebar.widget.maximizedbutton(c),
-                                awful.titlebar.widget.closebutton    (c),
-                                layout = wibox.layout.fixed.horizontal
-                            },
-                            layout = wibox.layout.align.horizontal
-                        },
-                        shape = function(cr, width, height)
-                            gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, (beautiful.titlebar_radius or dpi(20)))
-                        end,
-                        bg = bg_color,
-                        widget = wibox.container.background
-                    },
-                    top    = dpi(1),
-                    left   = dpi(1),
-                    right  = dpi(1),
-                    widget = wibox.container.margin
-                }, --]]
-                shape = function(cr, width, height)
-                    gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, (beautiful.titlebar_radius or dpi(20)))
-                end,
-                bg     = c.border_color,
-                widget = wibox.container.background
-            },
-            top    = (beautiful.border_width / 2) or dpi(1),
-            left   = (beautiful.border_width / 2) or dpi(1),
-            right  = (beautiful.border_width / 2) or dpi(1),
-            widget = wibox.container.margin
-        },
-        shape = function(cr, width, height)
-            gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, (beautiful.titlebar_radius or dpi(20)))
-        end,
-        bg     = beautiful.border_outer or '#2E3440',
-        widget = wibox.container.background
-    }
+	c.top_titlebar:setup {
+		{
+			{
+				{
+					{
+						{
+							{ -- Left
+								wibox.widget.separator { forced_width = dpi(6), orientation = 'horizontal', visible = true, opacity = 0 },
+								awful.titlebar.widget.iconwidget(c),
+								awful.titlebar.widget.floatingbutton (c),
+								awful.titlebar.widget.stickybutton   (c),
+								awful.titlebar.widget.ontopbutton    (c),
+								layout  = wibox.layout.fixed.horizontal
+							},
+							{ -- Middle
+								{ -- Title
+									align  = 'center',
+									font   = 'Source Sans Pro bold 12',
+									widget = awful.titlebar.widget.titlewidget(c)
+								},
+								buttons = buttons,
+								layout  = wibox.layout.flex.horizontal
+							},
+							{ -- Right
+								awful.titlebar.widget.minimizebutton (c),
+								awful.titlebar.widget.maximizedbutton(c),
+								awful.titlebar.widget.closebutton    (c),
+								layout = wibox.layout.fixed.horizontal
+							},
+							layout = wibox.layout.align.horizontal
+						},
+						shape = function(cr, width, height)
+							gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, (beautiful.titlebar_radius or dpi(20)))
+						end,
+						bg     = bg_color,
+						widget = wibox.container.background
+					},
+					top    = (beautiful.border_width / 2) or dpi(1),
+					left   = (beautiful.border_width / 2) or dpi(1),
+					right  = (beautiful.border_width / 2) or dpi(1),
+					widget = wibox.container.margin
+				}, --]]
+				shape = function(cr, width, height)
+					gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, (beautiful.titlebar_radius or dpi(20)))
+				end,
+				bg     = c.border_color,
+				widget = wibox.container.background
+			},
+			top    = (beautiful.border_width / 2) or dpi(1),
+			left   = (beautiful.border_width / 2) or dpi(1),
+			right  = (beautiful.border_width / 2) or dpi(1),
+			widget = wibox.container.margin
+		},
+		shape = function(cr, width, height)
+			gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, (beautiful.titlebar_radius or dpi(20)))
+		end,
+		bg     = beautiful.border_outer or '#2E3440',
+		widget = wibox.container.background
+	}
 
-    -- These are your "borders"
-    local left_titlebar = awful.titlebar(c, {
-        size            = beautiful.border_width or dpi(2),
-        enable_tooltip  = false,
-        position        = 'left',
-        bg              = c.border_color
-    })
-    left_titlebar:setup {
-        {
-            {
-                bg     = c.border_color,
-                widget = wibox.container.background
-            },
-            left   = (beautiful.border_width / 2) or dpi(1),
-            widget = wibox.container.margin
-        },
-        bg     = beautiful.border_outer or '#2E3440',
-        widget = wibox.container.background
-    }
+	-- These are your "borders"
+	local left_titlebar = awful.titlebar(c, {
+		size            = beautiful.border_width or dpi(2),
+		enable_tooltip  = false,
+		position        = 'left',
+		bg              = c.border_color
+	})
+	left_titlebar:setup {
+		{
+			{
+				{
+					left   = (beautiful.border_width / 2) or dpi(1),
+					widget = wibox.container.margin
+				},
+				bg     = c.border_color,
+				widget = wibox.container.background
+			},
+			left   = (beautiful.border_width / 2) or dpi(1),
+			widget = wibox.container.margin
+		},
+		bg     = beautiful.border_outer or '#2E3440',
+		widget = wibox.container.background
+	}
 
-    local right_titlebar = awful.titlebar(c, {
-        size            = beautiful.border_width or dpi(2),
-        enable_tooltip  = false,
-        position        = 'right',
-        bg              = c.border_color
-    })
-    right_titlebar:setup {
-        {
-            {
-                bg     = c.border_color,
-                widget = wibox.container.background
-            },
-            right  = (beautiful.border_width / 2) or dpi(1),
-            widget = wibox.container.margin
-        },
-        bg     = beautiful.border_outer or '#2E3440',
-        widget = wibox.container.background
-    }
+	local right_titlebar = awful.titlebar(c, {
+		size            = beautiful.border_width or dpi(2),
+		enable_tooltip  = false,
+		position        = 'right',
+		bg              = c.border_color
+	})
+	right_titlebar:setup {
+		{
+			{
+				{
+					right  = (beautiful.border_width / 2) or dpi(1),
+					widget = wibox.container.margin
+				},
+				bg     = c.border_color,
+				widget = wibox.container.background
+			},
+			right  = (beautiful.border_width / 2) or dpi(1),
+			widget = wibox.container.margin
+		},
+		bg     = beautiful.border_outer or '#2E3440',
+		widget = wibox.container.background
+	}
 
-    local bottom_titlebar = awful.titlebar(c, {
-        size            = beautiful.border_width or dpi(2),
-        enable_tooltip  = false,
-        position        = 'bottom',
-        bg              = c.border_color
-    })
-    bottom_titlebar:setup {
-        {
-            {
-                bg     = c.border_color,
-                widget = wibox.container.background
-            },
-            bottom = (beautiful.border_width / 2) or dpi(1),
-            left   = (beautiful.border_width / 2) or dpi(1),
-            right  = (beautiful.border_width / 2) or dpi(1),
-            widget = wibox.container.margin
-        },
-        bg     = beautiful.border_outer or '#2E3440',
-        widget = wibox.container.background
-    }
+	local bottom_titlebar = awful.titlebar(c, {
+		size            = beautiful.border_width or dpi(2),
+		enable_tooltip  = false,
+		position        = 'bottom',
+		bg              = c.border_color
+	})
+	bottom_titlebar:setup {
+		{
+			{
+				{
+					bottom = (beautiful.border_width / 2) or dpi(1),
+					left   = (beautiful.border_width / 2) or dpi(1),
+					right  = (beautiful.border_width / 2) or dpi(1),
+					widget = wibox.container.margin
+				},
+				bg     = c.border_color,
+				widget = wibox.container.background
+			},
+			bottom = (beautiful.border_width / 2) or dpi(1),
+			left   = (beautiful.border_width / 2) or dpi(1),
+			right  = (beautiful.border_width / 2) or dpi(1),
+			widget = wibox.container.margin
+		},
+		bg     = beautiful.border_outer or '#2E3440',
+		widget = wibox.container.background
+	}
 
-    --[[
-    local bottom_titlebar = awful.titlebar(c, {
-        size           = beautiful.titlebar_size or dpi(28),
-        enable_tooltip = false,
-        position       = 'bottom',
-    })
+	--[[
+	local bottom_titlebar = awful.titlebar(c, {
+		size           = beautiful.titlebar_size or dpi(28),
+		enable_tooltip = false,
+		position       = 'bottom',
+	})
 
-    bottom_titlebar:setup {
-        { -- Left
-            awful.titlebar.widget.iconwidget(c),
-            buttons = buttons,
-            layout  = wibox.layout.fixed.horizontal
-        },
-        { -- Middle
-            { -- Title
-                align  = 'center',
-                font   = 'Source Sans Pro bold 12',
-                widget = awful.titlebar.widget.titlewidget(c)
-            },
-            buttons = buttons,
-            layout  = wibox.layout.flex.horizontal
-        },
-        { -- Right
-            awful.titlebar.widget.floatingbutton (c),
-            awful.titlebar.widget.stickybutton   (c),
-            awful.titlebar.widget.ontopbutton    (c),
-            --awful.titlebar.widget.minimizebutton (c),
-            --awful.titlebar.widget.maximizedbutton(c),
-            awful.titlebar.widget.closebutton    (c),
-            layout = wibox.layout.fixed.horizontal
-        },
-        layout = wibox.layout.align.horizontal
-    }
-    --]]
+	bottom_titlebar:setup {
+		{ -- Left
+			awful.titlebar.widget.iconwidget(c),
+			buttons = buttons,
+			layout  = wibox.layout.fixed.horizontal
+		},
+		{ -- Middle
+			{ -- Title
+				align  = 'center',
+				font   = 'Source Sans Pro bold 12',
+				widget = awful.titlebar.widget.titlewidget(c)
+			},
+			buttons = buttons,
+			layout  = wibox.layout.flex.horizontal
+		},
+		{ -- Right
+			awful.titlebar.widget.floatingbutton (c),
+			awful.titlebar.widget.stickybutton   (c),
+			awful.titlebar.widget.ontopbutton    (c),
+			--awful.titlebar.widget.minimizebutton (c),
+			--awful.titlebar.widget.maximizedbutton(c),
+			awful.titlebar.widget.closebutton    (c),
+			layout = wibox.layout.fixed.horizontal
+		},
+		layout = wibox.layout.align.horizontal
+	}
+	--]]
 end)
 
 -- Enable sloppy focus, so that focus follows mouse and show the
 -- volume widget on the correct screen.
 client.connect_signal('mouse::enter', function(c)
-    c:emit_signal('request::activate', 'mouse_enter', {raise = false})
+	c:emit_signal('request::activate', 'mouse_enter', {raise = false})
 end)
 
 client.connect_signal('focus', function(c)
-    c.border_color = beautiful.border_focus
-    client.emit_signal('request::titlebars', c)
+	c.border_color = beautiful.border_focus
+	client.emit_signal('request::titlebars', c)
 end)
 client.connect_signal('unfocus', function(c)
-    c.border_color = beautiful.border_normal
-    client.emit_signal('request::titlebars', c)
+	c.border_color = beautiful.border_normal
+	client.emit_signal('request::titlebars', c)
 end)
 -- }}}
 
@@ -756,131 +681,211 @@ end)
 --local true_useless_gap = beautiful.useless_gap
 --local orig_client_size = {}
 screen.connect_signal('arrange', function (s)
-    local layout = s.selected_tag.layout.name
-    local is_single_client = #s.clients == 1
-    --[[
-    for _, c in pairs(s.clients) do
-        beautiful.useless_gap = true_useless_gap
-        if (layout == 'floating' or layout == 'max') then
-            beautiful.useless_gap = 0
-        end
-    end
-    --]]
+	local layout = s.selected_tag.layout.name
+	local is_single_client = #s.clients == 1
+	--[[
+	for _, c in pairs(s.clients) do
+		beautiful.useless_gap = true_useless_gap
+		if (layout == 'floating' or layout == 'max') then
+			beautiful.useless_gap = 0
+		end
+	end
+	--]]
 
-    for _, c in pairs(s.clients) do
-        if layout == 'floating' or c.floating and not c.maximized then
-            -- hide x11 borders and show titlebars
-            c.top_titlebar = awful.titlebar(c, {
-                size           = beautiful.titlebar_size or dpi(28),--beautiful.border_width or dpi(2),--
-                enable_tooltip = false,
-                position       = 'top',
-                bg             = '#00000030', -- transparency; may conflict with transparent titlebars by darkening them, but this makes shadows basically seamless.
-            })
+	for _, c in pairs(s.clients) do
+		--[[
+		if not c.borderless then
+			naughty.notify { text = tostring(c)..' is borderless' }
+			awful.titlebar.hide(c, 'top')
+			awful.titlebar.hide(c, 'right')
+			awful.titlebar.hide(c, 'left')
+			awful.titlebar.hide(c, 'bottom')
+		end
+		--]]
 
-   		    awful.spawn('xprop -id ' .. c.window .. ' -f _COMPTON_SHADOW 32c -set _COMPTON_SHADOW 1', false)
-            c.shape = function(cr, width, height)
-                gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, ((beautiful.titlebar_radius or dpi(20)) - dpi(8)))
-            end
-        else
-            -- hide titlebars and show x11 borders
-            c.top_titlebar = awful.titlebar(c, {
-                size           = beautiful.border_width or dpi(2),
-                enable_tooltip = false,
-                position       = 'top',
-                bg             = '#00000030', -- transparency; may conflict with transparent titlebars by darkening them, but this makes shadows basically seamless.
-            })
+		if (layout == 'floating' or c.floating and not c.maximized) then
+			-- show borders and titlebars
+			if (not c.borderless) then
+				c.top_titlebar = awful.titlebar(c, {
+					size           = (beautiful.titlebar_size or dpi(28)) + (beautiful.border_width or dpi(2)),
+					enable_tooltip = false,
+					position       = 'top',
+					bg             = '#00000030', -- transparency; may conflict with transparent titlebars by darkening them, but this makes shadows basically seamless.
+				})
+			else
+				awful.titlebar.hide(c, 'top')
+				awful.titlebar.hide(c, 'right')
+				awful.titlebar.hide(c, 'left')
+				awful.titlebar.hide(c, 'bottom')
+			end
 
-    		awful.spawn('xprop -id ' .. c.window .. ' -f _COMPTON_SHADOW 32c -set _COMPTON_SHADOW 0', false)
-            c.shape = gears.shape.square
-        end
-    end
+   			awful.spawn('xprop -id ' .. c.window .. ' -f _COMPTON_SHADOW 32c -set _COMPTON_SHADOW 1', false)
+			c.shape = function(cr, width, height)
+				gears.shape.partially_rounded_rect(cr, width, height, true, true, false, false, ((beautiful.titlebar_radius or dpi(20)) - dpi(8)))
+			end
+			--c.shape = gears.shape.square
+		--[[ elseif (c.maximized) then
+			naughty.notify {text='Maxed'}
+			c.shape                                          = gears.shape.square
+			c.top_titlebar.shape                             = gears.shape.square
+			c.top_titlebar.widget.widget.shape               = gears.shape.square
+			c.top_titlebar.widget.widget.widget.widget.shape = gears.shape.square ]]
+		else
+			-- show only borders
+			if (not c.borderless) then
+				c.top_titlebar = awful.titlebar(c, {
+					size           = beautiful.border_width or dpi(2),
+					enable_tooltip = false,
+					position       = 'top',
+					bg             = '#00000030', -- transparency; may conflict with transparent titlebars by darkening them, but this makes shadows basically seamless.
+				})
+			else
+				awful.titlebar.hide(c, 'top')
+				awful.titlebar.hide(c, 'right')
+				awful.titlebar.hide(c, 'left')
+				awful.titlebar.hide(c, 'bottom')
+			end
+
+			awful.spawn('xprop -id ' .. c.window .. ' -f _COMPTON_SHADOW 32c -set _COMPTON_SHADOW 0', false)
+			c.shape = gears.shape.square
+		end
+	end
 end)
 
 -- Autostart
 awful.spawn.with_shell(os.getenv('HOME') .. '/.screenlayout/layout.sh')
 awful.spawn.with_shell(config_dir .. '/scripts/autostart.sh')
---[[
---awful.spawn.with_shell('awesome-client '..'''..'naughty.notify({text = 'It works'})'..''')
---dofile(awful.util.getdir('config') .. 'config/autostart.lua')
---awful.spawn('hsetroot -add '#2e3440' -add '#eceff4' -gradient 180')
---awful.spawn('nitrogen --restore')
---awful.spawn('playerctld daemon')
---awful.spawn('lxqt-session -w 'awesome'')
---awful.spawn('lxqt-powermanagement')
---awful.spawn('lxqt-policykit-agent')
---awful.spawn.with_shell('picom --config ' .. config_dir .. '/other/picom/picom.conf&')
---naughty.notify { text = autostart }
---]]
 
 ----------------------------------------------------------------------------------------
 
 --[ [
 client.connect_signal('manage', function(c)
-    if not c.floating then
-        c.floating_width  = c.width
-        c.floating_height = c.height
-        c.floating_x      = c.x
-        c.floating_y      = c.y
-    end
+	if not c.floating then
+		c.floating_width  = c.width
+		c.floating_height = c.height
+		c.floating_x      = c.x
+		c.floating_y      = c.y
+	end
 
-    c:connect_signal('property::floating', function()
-        if c.floating then
-            c:set_width ( ((c.floating_width  or c.width ) - (beautiful.border_width or 0)) + dpi(2) )
-            c:set_height( ((c.floating_height or c.height) - ( (beautiful.titlebar_size or dpi(28)) + (beautiful.border_width or 0))) + dpi(4) )
-            c:set_x(c.floating_x or c.x)
-            c:set_y(c.floating_y or c.y)
-        else
-            c.floating_width  = c.width
-            c.floating_height = c.height
-            c.floating_x      = c.x
-            c.floating_y      = c.y
-        end
-    end)
+	c:connect_signal('property::floating', function()
+		if c.floating then
+			c:set_width ( ((c.floating_width  or c.width ) - (beautiful.border_width or 0)) + dpi(2) )
+			c:set_height( ((c.floating_height or c.height) - ( (beautiful.titlebar_size or dpi(28)) + (beautiful.border_width or 0))) + dpi(4) )
+			c:set_x(c.floating_x or c.x)
+			c:set_y(c.floating_y or c.y)
+		else
+			c.floating_width  = c.width
+			c.floating_height = c.height
+			c.floating_x      = c.x
+			c.floating_y      = c.y
+		end
+	end)
 end) --]]
 
 --[[
 local testbox = wibox {
-    type    = 'utility',
-    bg      = '#00000000',
-    screen  = screen.primary,
-    shape   = gears.shape.circle,
-    visible = true,
-    ontop   = true,
-    width   = 100,
-    height  = 100,
+	type    = 'utility',
+	bg      = '#00000000',
+	screen  = screen.primary,
+	shape   = gears.shape.circle,
+	visible = true,
+	ontop   = true,
+	width   = 100,
+	height  = 100,
 }
 
 local testbox_widget = wibox.widget {
-    {
-        text   = '',
-        widget = wibox.widget.textbox
-    },
-    shape  = gears.shape.circle,
-    bg     = '#FFFFFF',
-    widget = wibox.container.background,
+	{
+		text   = '',
+		widget = wibox.widget.textbox
+	},
+	shape  = gears.shape.circle,
+	bg     = '#FFFFFF',
+	widget = wibox.container.background,
 }
 
 testbox:setup {
-    {
-        testbox_widget,
-        layout = wibox.layout.flex.horizontal,
-    },
-    margins = dpi(8),
-    widget  = wibox.widget.margin,
-    layout  = wibox.layout.flex.vertical,
+	{
+		testbox_widget,
+		layout = wibox.layout.flex.horizontal,
+	},
+	margins = dpi(8),
+	widget  = wibox.widget.margin,
+	layout  = wibox.layout.flex.vertical,
 }
 
 awful.placement.centered(testbox)
 
 local testbox_bg_hue = 0
 gears.timer {
-    timeout   = 0.01,
-    autostart = true,
-    callback  = function()
-        if testbox_bg_hue >= 1 then testbox_bg_hue = 0 end
-        testbox_widget:set_bg(hsl(testbox_bg_hue, 1, 0.5))
-        testbox_bg_hue = testbox_bg_hue + 0.01
-        --naughty.notify({ text = tostring(hsl(testbox_bg_hue, 1, 0.5)) })
-    end
+	timeout   = 0.01,
+	autostart = true,
+	callback  = function()
+		if testbox_bg_hue >= 1 then testbox_bg_hue = 0 end
+		testbox_widget:set_bg(hsl(testbox_bg_hue, 1, 0.5))
+		testbox_bg_hue = testbox_bg_hue + 0.01
+		--naughty.notify({ text = tostring(hsl(testbox_bg_hue, 1, 0.5)) })
+	end
+}
+--]]
+
+--[[
+testwibox = wibox {
+	bg      = '#0000',
+	width   = dpi(300),
+	height  = dpi(300),
+	type    = 'utility',
+	screen  = 'primary',
+	visible = true,
+	ontop   = true,
+}
+
+awful.placement.bottom_left(testwibox)
+
+testwidget = wibox.widget {
+	{
+		text   = 'Hello',
+		align  = 'center',
+		valign = 'center',
+		widget = wibox.widget.textbox,
+	},
+	bg                 = beautiful.nord0,
+	shape              = rounded_rectangle(dpi(20)),
+	shape_border_width = dpi(1),
+	shape_border_color = beautiful.nord4,
+	widget             = wibox.container.background,
+}
+
+function add_shadow(widget, size, radius, layerdist)
+	size      = size      or 10
+	radius    = radius    or dpi(20)
+	layerdist = layerdist or 1
+
+	for i=1, size do
+		widget = wibox.widget {
+			{
+				widget,
+				margins = layerdist,
+				widget  = wibox.container.margin,
+			},
+			bg     = '#00000004',
+			shape  = rounded_rectangle(radius),
+			widget = wibox.container.background,
+		}
+	end
+
+	return(widget)
+end
+
+testwidget = add_shadow(testwidget, 20, dpi(20), 1)
+
+testwibox:setup {
+	nil,
+	{
+		testwidget,
+		margins = dpi(10),
+		widget  = wibox.container.margin,
+	},
+	layout = wibox.layout.align.vertical,
 }
 --]]

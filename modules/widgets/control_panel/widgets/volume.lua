@@ -29,8 +29,8 @@ local test = wibox {
 }
 --]]
 
-local volume_slider
-function volume_slider()
+local volume_widget
+function volume_widget()
 	local main = {}
 
 	main.volume_slider_text   = wibox.widget {
@@ -40,13 +40,13 @@ function volume_slider()
 	}
 
 	main.volume_slider_widget = wibox.widget {
-		bar_shape           = gears.shape.rounded_bar,
-		bar_height          = dpi(4),
-		bar_color           = beautiful.nord8,
-		handle_color        = beautiful.nord4,
-		handle_shape        = gears.shape.circle,
-		handle_border_color = beautiful.nord3,
-		handle_border_width = dpi(2),
+		bar_shape           = beautiful.qrwidget_volume_slider_bar_shape           or gears.shape.rounded_bar,
+		bar_height          = beautiful.qrwidget_volume_slider_bar_height          or dpi(4),
+		bar_color           = beautiful.qrwidget_volume_slider_bar_color           or '#8FBCBB',
+		handle_color        = beautiful.qrwidget_volume_slider_handle_color_normal or '#D8DEE9',
+		handle_shape        = beautiful.qrwidget_volume_slider_handle_shape        or gears.shape.circle,
+		handle_border_color = beautiful.qrwidget_volume_slider_handle_border_color or '#4C566A',
+		handle_border_width = beautiful.qrwidget_volume_slider_handle_border_width or dpi(2),
 		value               = 50,
 		minimum             = 0,
 		maximum             = 100,
@@ -102,41 +102,33 @@ function volume_slider()
 					main.volume_slider,
 					layout = wibox.layout.align.horizontal,
 				},
-				left   = dpi(15),
-				right  = dpi(15),
+				left   = dpi(4),
+				right  = dpi(16),
 				widget = wibox.container.margin,
 			},
-			bg                 = beautiful.control_panel_volume_bg or beautiful.nord0 or '#2E3440',
-			shape              = beautiful.control_panel_volume_shape or rounded_rectangle(dpi(20)),
-			shape_border_width = beautiful.control_panel_volume_shape_width or dpi(1),
-			shape_border_color = beautiful.control_panel_volume_shape_color or beautiful.nord4 or '#D8DEE9',
-			widget             = wibox.container.background,
+			layout = wibox.layout.fixed.horizontal,
 		},
-		strategy = 'exact',
-		--width    = w - dpi(20),
+		strategy = 'max',
 		height   = dpi(60),
 		widget   = wibox.container.constraint
 	}
 
 	local old_cursor, old_wibox
 	main.volume_slider_widget:connect_signal('mouse::enter', function(c)
-		c:set_handle_color(beautiful.nord7)
+		c:set_handle_color(beautiful.qrwidget_volume_slider_handle_color_hover or '#ECEFF4')
 		local wb = mouse.current_wibox
 		old_cursor, old_wibox = wb.cursor, wb
 		wb.cursor = 'hand1'
 	end)
 	main.volume_slider_widget:connect_signal('mouse::leave', function(c)
-		c:set_handle_color(beautiful.nord4)
+		c:set_handle_color(beautiful.qrwidget_volume_slider_handle_color_normal or '#D8DEE9')
 		if old_wibox then
 			old_wibox.cursor = old_cursor
 			old_wibox = nil
 		end
 	end)
 
-	main.volume_slider_widget:connect_signal('button::press',   function(c) c:set_handle_color(beautiful.nord8) end)
-	main.volume_slider_widget:connect_signal('button::release', function(c) c:set_handle_color(beautiful.nord7) end)
-
 	return(main.main_widget)
 end
 
-return(volume_slider)
+return(volume_widget)

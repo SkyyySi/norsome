@@ -2,8 +2,122 @@ local rounded_rectangle = require('rounded_rectangle')
 local infobubble        = require('infobubble')
 local buttonify         = require('buttonify')
 
-local volume_button
-function volume_button(s)
+local function volume_button(s)
+    local arrow_size   = dpi(10)
+    local widget_shape = infobubble(dpi(20), arrow_size)
+
+	-- How the widget should look in the wibox / panel
+	local volume_button_text = wibox.widget {
+		font   = 'Source Code Pro Bold 12',
+		text   = '🔊 50',
+		widget = wibox.widget.textbox,
+	}
+
+	awesome.connect_signal('qrlinux::media::get_volume', function(volume)
+		--naughty.notify({text = tostring(volume)})
+		local text = volume
+		    if volume == 0 then text = '🔇 ' .. tostring(volume)
+		elseif volume < 25 then text = '🔈 ' .. tostring(volume)
+		elseif volume < 75 then text = '🔉 ' .. tostring(volume)
+		else text = '🔊 ' .. tostring(volume)
+		end
+		volume_button_text:set_text(text)
+	end)
+
+	-- The widget to show in the wibox / panel
+	local volume_widget_panel_button = wibox.widget {
+		{
+			{
+				{
+					volume_button_text,
+					layout = wibox.layout.align.horizontal,
+				},
+				top    = dpi(4),
+				bottom = dpi(4),
+				left   = dpi(8),
+				right  = dpi(8),
+				widget = wibox.container.margin
+			},
+			bg                 = beautiful.button_normal,
+			shape_border_width = dpi(1),
+			shape_border_color = beautiful.nord4 or '#d8dee9',
+			shape              = gears.shape.rounded_bar,
+			widget             = wibox.container.background,
+		},
+		margins = dpi(4),
+		widget  = wibox.container.margin
+	}
+	buttonify({ widget = volume_widget_panel_button.widget })
+
+	local function update_volume(v)
+		if v then
+			--set_volume(v)
+			if     v < 0   then v = 0
+			elseif v > 100 then v = 100 end
+			awesome.emit_signal('qrlinux::media::set_volume', v)
+			--s.volume_widget.volslider.value = v
+		end
+	end
+
+	volume_widget_panel_button:connect_signal('button::press', function(_,_,_,b)
+		awful.spawn.easy_async('pamixer --get-volume', function(v)
+			v = tonumber(v)
+			if (b == 4) then
+				v = v + 5 -- increase volume by 5 percent
+			elseif (b == 5) then
+				v = v - 5 -- decrease volume by 5 percent
+			end
+			update_volume(v)
+		end)
+	end)
+
+	volume_widget_popup = wibox {
+		widget = {
+			make_widget {
+				widget = double_border_widget {
+					widget = wibox.widget {
+						{
+							widget = require('widgets.control_panel.widgets.volume')
+						},
+						margins = {
+							top = arrow_size,
+						},
+						widget = wibox.container.margin,
+					},
+					shape = widget_shape,
+				},
+				mode   = 'fixed',
+				width  = dpi(350),
+				height = dpi(60) + arrow_size,
+				shape  = rounded_rectangle(dpi(5)),
+			},
+			margins = 0,
+			widget  = wibox.container.margin,
+		},
+		bg      = '#00000030',
+		shape   = widget_shape,
+		visible = false,
+		ontop   = true,
+		width   = dpi(350),
+		height  = dpi(60) + arrow_size,
+		screen  = s,
+	}
+
+	volume_widget_panel_button:connect_signal('button::release', function(_,_,_,b)
+		if (b == 1) then
+			update_volume()
+			volume_widget_popup.visible = (not volume_widget_popup.visible)
+
+			center = mouse.current_widget_geometry.x - ((volume_widget_popup.width / 2) or 0)
+			awful.placement.top_left(volume_widget_popup, { margins = {top = dpi(48), left = center }, parent = s })
+		elseif (b == 2) then
+			awful.spawn('pavucontrol-qt')
+		end
+	end)
+
+	return(volume_widget_panel_button)
+
+    --[[
     local s = s or awful.screen.focused()
     s.volume_widget = {}
     local arrow_width = dpi(10)
@@ -38,19 +152,19 @@ function volume_button(s)
     s.volume_widget.volume_button = wibox.widget {
         {{{
                     s.volume_widget.volume_button_text,
-                    layout  = wibox.layout.align.horizontal,
+                    layout = wibox.layout.align.horizontal,
                 },
-                top = dpi(4), bottom = dpi(4), left = dpi(8), right = dpi(8),
+                top    = dpi(4), bottom = dpi(4), left = dpi(8), right = dpi(8),
                 widget = wibox.container.margin
             },
-            bg = beautiful.button_normal,
+            bg                 = beautiful.button_normal,
             shape_border_width = dpi(1),
             shape_border_color = beautiful.nord4 or '#d8dee9',
-            shape = gears.shape.rounded_bar,
-            widget = wibox.container.background,
+            shape              = gears.shape.rounded_bar,
+            widget             = wibox.container.background,
         },
         margins = dpi(4),
-        widget = wibox.container.margin
+        widget  = wibox.container.margin
     }
 
     s.volume_widget.get_volume(function(volume)
@@ -88,17 +202,19 @@ function volume_button(s)
                         layout = wibox.layout.align.horizontal,
                     },
                     margins = dpi(4),
-                    widget = wibox.container.margin
+                    widget  = wibox.container.margin
                 },
                 {
                     {
                         s.volume_widget.volslider,
                         layout = wibox.layout.align.horizontal,
                     },
-                    top = dpi(4), bottom = dpi(4), right = dpi(8),
+                    top    = dpi(4),
+                    bottom = dpi(4),
+                    right  = dpi(8),
                     widget = wibox.container.margin
                 },
-                layout  = wibox.layout.align.horizontal,
+                layout = wibox.layout.align.horizontal,
             },
             visible = true,
             widget  = wibox.container.background,
@@ -190,9 +306,9 @@ function volume_button(s)
                 top    = arrow_width,
                 widget = wibox.container.margin,
             },
-            shape_border_width = dpi(2),
-            shape_border_color = '#FFFFFF',
             shape              = s.volume_widget.shape,
+            shape_border_color = beautiful.qrwidget_shape_border_color,
+            shape_border_width = beautiful.qrwidget_shape_border_width,
             widget             = wibox.widget.background,
         }
 
@@ -226,7 +342,7 @@ function volume_button(s)
 
     buttonify({widget = s.volume_widget.volume_button.widget})
 
-    return(s.volume_widget.volume_button)
+    return(s.volume_widget.volume_button) --]]
 end
 
 return(volume_button)

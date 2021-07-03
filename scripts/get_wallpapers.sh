@@ -24,5 +24,5 @@ list_images() {
 }
 
 for i in "${!WALLPAPER_DIRS[@]}"; do
-	list_images "${WALLPAPER_DIRS[i]}" | uniq -u | sort
+	list_images "${WALLPAPER_DIRS[i]}" | uniq -u | sort | sed '/*/d'
 done

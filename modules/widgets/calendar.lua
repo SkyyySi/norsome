@@ -1,7 +1,81 @@
 local rounded_rectangle = require('rounded_rectangle')
 local infobubble        = require('infobubble')
 
-function calendar_widget(s)
+local function calendar_widget(s)
+    local arrow_size   = dpi(10)
+    local widget_shape = infobubble(dpi(20), arrow_size)
+
+	-- How the widget should look in the wibox / panel
+	local calendar_widget_panel_button_text = wibox.widget {
+        refresh = 1,
+        format  = '%a %b %d, %T',
+        widget  = wibox.widget.textclock,
+	}
+
+	-- The widget to show in the wibox / panel
+	local calendar_widget_panel_button = wibox.widget {
+		{
+			{
+				{
+                    {
+                        widget = calendar_widget_panel_button_text,
+                    },
+                    left   = dpi(10),
+                    right  = dpi(10),
+                    widget = wibox.container.margin
+                },
+                layout = wibox.layout.align.horizontal
+            },
+            bg                 = beautiful.button_normal,
+            shape_border_width = dpi(1),
+            shape_border_color = beautiful.nord4,
+            shape              = gears.shape.rounded_bar,
+            widget             = wibox.container.background
+        },
+        margins = dpi(4),
+        widget  = wibox.container.margin
+    }
+	buttonify({ widget = calendar_widget_panel_button.widget })
+
+    calendar_widget_popup_widget = wibox.widget {
+        widget = double_border_widget {
+            widget = wibox.widget {
+                {
+                    widget = require('widgets.control_panel.widgets.calendar')
+                },
+                margins = {
+                    top = arrow_size,
+                },
+                widget = wibox.container.margin,
+            },
+            shape = widget_shape,
+        },
+        mode      = 'fixed',
+        screen    = s,
+        width     = dpi(192),
+        height    = dpi(230),
+        placement = 'bottom_right',
+    }
+
+    calendar_widget_popup = make_widget {
+        visible = false,
+        widget  = calendar_widget_popup_widget,
+        screen  = s,
+        shape   = widget_shape,
+        mode    = 'popup',
+    }
+
+    calendar_widget_panel_button:connect_signal('button::release', function(c, _, _, button)
+        if button == 1 then
+            center = mouse.current_widget_geometry.x - ((calendar_widget_popup.width or 0) / 2) + ((calendar_widget_panel_button.width or 0) / 2)
+            awful.placement.top_left(calendar_widget_popup, { margins = {top = 48, left = center }, parent = s })
+
+            calendar_widget_popup.visible = (not calendar_widget_popup.visible)
+        end
+    end)
+
+    return(calendar_widget_panel_button)
+    --[[
     local s = s or awful.screen.focused()
 
     s.calendar = wibox {
@@ -151,6 +225,7 @@ function calendar_widget(s)
     s.calendar_button.widget:connect_signal('button::release', function(c) c:set_bg(beautiful.button_release) end) -- released / nord 2
 
     return(s.calendar_button)
+    --]]
 end
 
 return(calendar_widget)

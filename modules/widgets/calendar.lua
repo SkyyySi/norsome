@@ -37,7 +37,7 @@ local function calendar_widget(s)
     }
 	buttonify({ widget = calendar_widget_panel_button.widget })
 
-    calendar_widget_popup_widget = wibox.widget {
+    local calendar_widget_popup_widget = wibox.widget {
         widget = double_border_widget {
             widget = wibox.widget {
                 {
@@ -57,7 +57,7 @@ local function calendar_widget(s)
         placement = 'bottom_right',
     }
 
-    calendar_widget_popup = make_widget {
+    local calendar_widget_popup = make_widget {
         visible = false,
         widget  = calendar_widget_popup_widget,
         screen  = s,

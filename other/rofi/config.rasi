@@ -5,10 +5,6 @@
 
 configuration {
 /*	theme:                     "Nordic"; */
-	fullscreen:                  false;
-	location:                    0;
-	xoffset:                     0;
-	yoffset:                     0;
 	modi:                        "drun,window,ssh,run";
 	font:                        "Source Sans Pro Semibold 16";
 	combi-modi:                  "window,drun,ssh";
@@ -16,39 +12,61 @@ configuration {
 	display-window:              "Window";
 	display-ssh:                 "SSH";
 	display-run:                 "Commands";
+	location:                    0;
+	xoffset:                     0;
+	yoffset:                     0;
+	fullscreen:                  false;
 	show-icons:                  true;
-	sidebar-mode:                false;
+	sidebar-mode:                true;
 }
 
 * {
-	background:                  #3b4252;
-	background-color:            #3b4252;
-	normal-background:           #3b4252;
-	active-background:           #3b4252;
-	urgent-background:           #bf616a;
-	alternate-normal-background: #434c5e;
-	alternate-active-background: #434c5e;
-	alternate-urgent-background: #bf616a;
-	selected-normal-background:  #5e81ac;
-	selected-active-background:  #5e81ac;
-	selected-urgent-background:  #ebcb8b;
+	nord0:                       hsla(220,   16.4%, 21.6%, 100%);
+	nord1:                       hsla(221.7, 16.3%, 27.6%, 100%);
+	nord2:                       hsla(220,   16.8%, 31.6%, 100%);
+	nord3:                       hsla(220,   16.5%, 35.7%, 100%);
+	nord4:                       hsla(218.8, 27.9%, 88%,   100%);
+	nord5:                       hsla(218.2, 26.8%, 92%,   100%);
+	nord6:                       hsla(217.5, 26.7%, 94.1%, 100%);
+	nord7:                       hsla(178.7, 25.1%, 64.9%, 100%);
+	nord8:                       hsla(193.3, 43.4%, 67.5%, 100%);
+	nord9:                       hsla(210,   34%,   63.1%, 100%);
+	nord10:                      hsla(213.1, 32%,   52.2%, 100%);
+	nord12:                      hsla(354.3, 42.3%, 56.5%, 100%);
+	nord12:                      hsla(14.4,  50.5%, 62.7%, 100%);
+	nord13:                      hsla(40,    70.6%, 73.3%, 100%);
+	nord14:                      hsla(92.4,  27.8%, 64.7%, 100%);
+	nord15:                      hsla(311.1, 20.2%, 63.1%, 100%);
+	background:                  @nord1;
+	background-color:            @nord1;
+	normal-background:           @nord1;
+	active-background:           @nord1;
+	urgent-background:           @nord11;
+	alternate-normal-background: @nord2;
+	alternate-active-background: @nord2;
+	alternate-urgent-background: @nord11;
+	selected-normal-background:  @nord10;
+	selected-active-background:  @nord10;
+	selected-urgent-background:  @nord13;
 
-	foreground:                  #d8dee9;
-	foreground-color:            #d8dee9;
-	normal-foreground:           #d8dee9;
-	active-foreground:           #d8dee9;
-	urgent-foreground:           #2e3440;
-	alternate-normal-foreground: #d8dee9;
-	alternate-active-foreground: #d8dee9;
-	alternate-urgent-foreground: #2e3440;
-	selected-normal-foreground:  #d8dee9;
-	selected-active-foreground:  #d8dee9;
-	selected-urgent-foreground:  #2e3440;
+	foreground:                  @nord4;
+	foreground-color:            @nord4;
+	normal-foreground:           @nord4;
+	active-foreground:           @nord4;
+	urgent-foreground:           @nord0;
+	alternate-normal-foreground: @nord4;
+	alternate-active-foreground: @nord4;
+	alternate-urgent-foreground: @nord0;
+	selected-normal-foreground:  @nord4;
+	selected-active-foreground:  @nord4;
+	selected-urgent-foreground:  @nord0;
 
 	spacing:                     2;
 	margin:                      2;
 	padding:                     2;
     scrollbar:                   true;
+    hide-scrollbar:              false;
+	scrollbar-width:             16;
 }
 #window {
     background-color: @background;
@@ -56,7 +74,7 @@ configuration {
     padding:                     5;
 	border-radius:               20;
 	border:                      2;
-	border-color:                #d8dee9;
+	border-color:                @nord4;
 }
 #mainbox {
     border:  0;

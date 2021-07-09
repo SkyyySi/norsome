@@ -237,6 +237,7 @@ theme.icon.folder     = theme_dir .. 'qrlinux/folder.svg'
 theme.icon.web        = theme_dir .. 'qrlinux/web.svg'
 theme.icon.note       = theme_dir .. 'qrlinux/musical-note.svg'
 theme.icon.night_mode = theme_dir .. 'qrlinux/moon.svg'
+theme.icon.microphone = theme_dir .. 'qrlinux/microphone.svg'
 
 -- Define the icon theme for application icons. If not set then the icons
 -- from /usr/share/icons and /usr/share/icons/hicolor will be used.

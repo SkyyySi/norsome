@@ -2,7 +2,7 @@ local username = os.getenv('USER')
 
 --- VOLUME ---
 --local get_volume_cmd = 'bash -c "while true; do pamixer --get-volume; sleep 0.1; done"'
-awful.spawn.easy_async({'pkill', '--full', '--uid', username, '^bash -c while true; do pamixer --get-volume; sleep 0.1; done'}, function()
+awful.spawn.easy_async({'pkill', '-fU', username, '^bash -c while true; do pamixer --get-volume; sleep 0.1; done'}, function()
 	awful.spawn.with_line_callback('bash -c "while true; do pamixer --get-volume; sleep 0.1; done"', {stdout = function(stdout)
 		awesome.emit_signal('qrlinux::media::get_volume', tonumber(stdout))
 	end})

@@ -33,7 +33,6 @@ local awesome_menu = awful.menu {
 		{ 'File manager', filemanager,  beautiful.icon.folder   },
 		{ 'Web browser',  webbrowser,   beautiful.icon.web      },
 	},
-	border_width = dpi(1),
 	shape = gears.shape.rounded_rect
 }
 

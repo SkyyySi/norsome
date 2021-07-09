@@ -2,7 +2,7 @@ local username = os.getenv('USER')
 local confdir  = awful.util.getdir('config')
 
 local wifi_status_command = (confdir .. 'scripts/wifi_status.sh')
-awful.spawn.easy_async({'pkill', '--full', '--uid', username, wifi_status_command}, function()
+awful.spawn.easy_async_with_shell('pkill -fU ' .. username .. wifi_status_command, function()
 	awful.spawn.with_line_callback((wifi_status_command), { stdout = function(status)
 		local s
 

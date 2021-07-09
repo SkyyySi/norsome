@@ -3,8 +3,7 @@ local buttonify         = require('buttonify')
 local toggle_button     = require('widgets.control_panel.toggle_button')
 require('signals.network')
 
-local control_panel_widget
-function control_panel_widget(s)
+local function control_panel_widget(s)
 	local control_panel_setting = {}
 	control_panel_setting.widget = {}
 	control_panel_setting.width  = dpi(400)
@@ -25,14 +24,28 @@ function control_panel_widget(s)
 	qrwidget.music(s)
 	qrwidget.night_mode(s, '#854b11')
 
-	local toggle_button_buttons = wibox.widget {
+	local toggle_mic_shell_script = [[sh -c '
+		for i in $(pactl list sources short | awk "{print \$2}"); do
+			pactl set-source-mute "${i}" toggle
+		done
+	']]
+
+	local mic_status_shell_script = [[sh -c '
+	if [ "$(pacmd list-sources | command grep "mute" | awk "NR==1{print \$2}" 2> /dev/null)" = "yes" ]; then
+		printf "false"
+	else
+		printf "true"
+	fi
+	']]
+
+	toggle_button_buttons = wibox.widget {
 		-- Please refer to toggle_button.lua if you want to see the available options.
 		toggle_button {
-			icon          = beautiful.icon.night_mode,
-			title         = 'Night mode',
-			deactivate    = 'always',
-			active        = false,
-			lclick        = function()
+			icon       = beautiful.icon.night_mode,
+			title      = 'Night mode',
+			deactivate = 'always',
+			active     = false,
+			lclick     = function()
 				awesome.emit_signal('qrlinux::util::night_mode')
 			end,
 		},
@@ -43,6 +56,16 @@ function control_panel_widget(s)
 			control_signal = 'qrlinux::wifi::enabled',
 			lclick         = function()
 				awesome.emit_signal('qrlinux::wifi::toggle')
+			end,
+		},
+		toggle_button {
+			icon       = beautiful.icon.microphone,
+			title      = 'Microphone',
+			deactivate = 'signals',
+			active     = true,
+			control_signal = 'qrlinux::media::microphone_status',
+			lclick     = function()
+				awful.spawn(toggle_mic_shell_script)
 			end,
 		},
 		-- Toggle buttons can also be used as shortcuts, for example like this:
@@ -57,6 +80,21 @@ function control_panel_widget(s)
 		forced_num_cols = 4,
 		spacing         = dpi(5),
 		layout          = wibox.layout.grid,
+	}
+
+	gears.timer {
+		autostart = true,
+		call_now  = true,
+		timeout   = 1,
+		callback  = function()
+			awful.spawn.easy_async(mic_status_shell_script, function(mic_status)
+				if (mic_status == 'true\n') then
+					awesome.emit_signal('qrlinux::media::microphone_status', true)
+				else
+					awesome.emit_signal('qrlinux::media::microphone_status', false)
+				end
+			end)
+		end
 	}
 
 	local function control_panel_widget_wrapper(w, m)

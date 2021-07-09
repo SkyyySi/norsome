@@ -2,9 +2,14 @@
 # Reset the screenlayout
 [[ -f "${HOME}/.screenlayout/layout.sh" ]] && "${HOME}/.screenlayout/layout.sh"
 
-CONFIG_PREFIX="${XDG_CONFIG_DIR:-${HOME}/.config}/awesome/other"
+CONFIG_DIR="${XDG_CONFIG_DIR:-${HOME}/.config}"
+CONFIG_PREFIX="${CONFIG_DIR}/awesome/other"
+
+# This script must not be run in a loop
+#"${CONFIG_DIR}/awesome/scripts/start_jack.sh"
 
 # These cannot be checked with pgrep for some reason
+pkill -fU "${USER}" '^lxqt-policykit-agent'
 lxqt-policykit-agent&
 lxqt-powermanagement&
 playerctld daemon&
@@ -16,10 +21,10 @@ run=(
 	'pasystray'
 	"picom --config ${CONFIG_PREFIX}/picom/picom.conf"
 #	'playerctld daemon'
-#	'timidity -iA'
-#	'ulauncher'
+	'timidity -iA'
+	'ulauncher'
 	'unclutter -b'
-	'xscreensaver -no-splash'
+#	'xscreensaver -no-splash'
 )
 
 check_running() {
@@ -43,7 +48,7 @@ run() {
 re_run() {
 	while true; do
 		run "${*}"
-		sleep 1
+		sleep 10
 	done
 }
 

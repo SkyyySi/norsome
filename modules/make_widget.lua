@@ -16,7 +16,7 @@ local function make_widget(arg)
 		visible_desktop    = arg.visible         or beautiful.qrwidget_visible_desktop    or true,
 		ontop_desktop      = arg.ontop           or beautiful.qrwidget_ontop_desktop      or false,
 		visible_popup      = arg.visible         or beautiful.qrwidget_visible_popup      or false,
-		ontop_popup        = arg.ontop           or beautiful.qrwidget_ontop_popup        or true,_popup
+		ontop_popup        = arg.ontop           or beautiful.qrwidget_ontop_popup        or true,
 	}
 
 	if (prop.mode == 'normal') then

@@ -96,7 +96,7 @@ local function calendar_widget(s)
 
 
     local styles = {}
-    styles.month = { bg_color = '#00000000', padding = dpi(10) }
+    styles.month = { bg_color = gears.color.transparent, padding = dpi(10) }
     styles.normal  = { shape    = rounded_rectangle(dpi(8)) }
     styles.focus   = { fg_color = (beautiful.nord0 or '#2E3440'),
                        bg_color = (beautiful.nord13 or '#EBCB8B'),

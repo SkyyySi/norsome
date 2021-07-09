@@ -24,7 +24,7 @@ local function make_widget(arg)
 	elseif (prop.mode == 'desktop') then
 		local desktop_widget = wibox {
 			type    = 'desktop',
-			bg      = '#00000000',
+			bg      = gears.color.transparent,
 			width   = prop.width,
 			height  = prop.height,
 			visible = prop.visible_desktop,
@@ -85,7 +85,7 @@ local function make_widget(arg)
 				layout = wibox.layout.fixed.vertical,
 			},
 			type    = 'popup_menu',
-			bg      = '#00000000',
+			bg      = gears.color.transparent,
 			screen  = prop.screen,
 			shape   = prop.shape,
 			visible = true,

@@ -500,7 +500,7 @@ end) --]]
 --[[
 local testbox = wibox {
 	type    = 'utility',
-	bg      = '#00000000',
+	bg      = gears.color.transparent,
 	screen  = screen.primary,
 	shape   = gears.shape.circle,
 	visible = true,

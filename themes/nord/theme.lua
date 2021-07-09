@@ -67,7 +67,7 @@ theme.button_border_shape = gears.shape.rounded_bar
 theme.button_border_color = theme.nord4 or '#D8DEE9'
 theme.button_border_width = dpi(1)
 
-theme.menubutton_normal  = '#00000000'             -- default
+theme.menubutton_normal  = gears.color.transparent -- default
 theme.menubutton_enter   = theme.button_enter      -- hovered
 theme.menubutton_press   = theme.button_press      -- pressed
 theme.menubutton_release = theme.button_enter      -- released

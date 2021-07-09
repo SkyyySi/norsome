@@ -108,7 +108,7 @@ function music_button(s)
 				margins = dpi(6),
 				widget = wibox.container.margin,
 			},
-			bg                 = beautiful.nord1 or '#00000000',
+			bg                 = beautiful.nord1 or gears.color.transparent,
 			shape              = gears.shape.circle,
 			shape_border_width = dpi(1),
 			shape_border_color = (beautiful.nord4 or '#D8DEE9'),

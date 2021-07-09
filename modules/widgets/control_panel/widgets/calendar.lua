@@ -1,6 +1,8 @@
 local function calendar_widget()
 	local styles = {}
-	styles.month = { bg_color = '#00000000', padding = dpi(10) }
+	styles.month = {
+		bg_color = gears.color.transparent,
+		padding  = dpi(10) }
 	styles.normal = {
 		shape = rounded_rectangle(dpi(8))
 	}
